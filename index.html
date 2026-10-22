@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Forever Florals, Eternal Ribbon Roses</title>
+<meta name="description" content="Shop handcrafted eternal ribbon-rose bouquets from Forever Florals in Jamaica. Choose your bouquet size, custom details, and delivery option.">
+<meta name="theme-color" content="#5c0e33">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Forever Florals, Eternal Ribbon Roses">
+<meta property="og:description" content="Handcrafted eternal ribbon-rose bouquets, customized and delivered with care across Jamaica.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,0..144,500;1,0..144,600&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blush:#fff3f6; --peach:#ffd8c9; --lav:#e3d3f2; --magenta:#c81d67; --deep:#5c0e33;
+  --ink:#2c0f1e; --gold:#d9a441; --glass:rgba(255,255,255,.5); --glass-brd:rgba(255,255,255,.65);
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html{scroll-behavior:smooth; scroll-padding-top:118px;}
+body{background:var(--blush); color:var(--ink); font-family:'Sora',sans-serif; line-height:1.6; overflow-x:hidden; position:relative;}
+h1,h2,h3{font-family:'Fraunces',serif; letter-spacing:-.01em;}
+a{color:inherit; text-decoration:none;}
+.wrap{max-width:1160px; margin:0 auto; padding:0 24px; position:relative; z-index:2;}
+img,svg{max-width:100%; display:block;}
+@media(prefers-reduced-motion:reduce){*{animation:none!important; transition:none!important;}}
+
+.grain{position:fixed; inset:0; z-index:1; pointer-events:none; opacity:.05; mix-blend-mode:overlay; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+.blobs{position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none;}
+.blob{position:absolute; border-radius:50%; filter:blur(60px); opacity:.5; mix-blend-mode:multiply;}
+.b1{width:520px; height:520px; background:var(--peach); top:-120px; left:-140px; animation:float1 22s ease-in-out infinite alternate;}
+.b2{width:460px; height:460px; background:var(--lav); top:280px; right:-160px; animation:float2 26s ease-in-out infinite alternate;}
+.b3{width:400px; height:400px; background:#ffc3dc; bottom:-100px; left:20%; animation:float1 19s ease-in-out infinite alternate-reverse;}
+@keyframes float1{from{transform:translate(0,0) scale(1);} to{transform:translate(60px,40px) scale(1.12);}}
+@keyframes float2{from{transform:translate(0,0) scale(1);} to{transform:translate(-50px,60px) scale(1.08);}}
+
+/* announcement bar */
+.announce{background:transparent; color:var(--deep); text-align:center; font-size:.85rem; padding:5px 16px 2px; max-height:32px; overflow:hidden; opacity:1; transition:max-height .3s ease, padding .3s ease, opacity .2s ease;}
+.announce b{color:var(--magenta);}
+
+/* header */
+header{position:fixed; top:0; left:0; right:0; z-index:100; padding-top:env(safe-area-inset-top,0px);}
+.nav{display:flex; align-items:center; justify-content:space-between; padding:7px 24px; max-width:1160px; margin:10px auto 0; background:rgba(244,160,193,.94); backdrop-filter:blur(16px) saturate(160%); -webkit-backdrop-filter:blur(16px) saturate(160%); border:1px solid rgba(255,255,255,.8); border-radius:20px; transition:all .35s ease;}
+header.shrink .announce{max-height:0; padding-top:0; padding-bottom:0; opacity:0;}
+header.shrink .nav{padding:5px 22px; margin-top:6px; box-shadow:0 8px 28px rgba(92,14,51,.18);}
+.logo{height:42px; width:250px; min-width:250px; position:relative; overflow:visible; flex-shrink:0;}
+.logo-img{position:absolute; left:0; top:50%; transform:translateY(-50%) scale(1.25); transform-origin:left center; height:84px; width:auto; display:block;}
+@media(max-width:560px){.logo{height:30px; width:130px; min-width:130px;} .logo-img{height:54px;}}
+@media(max-width:380px){.logo{width:110px; min-width:110px;} .logo-img{height:52px;}}
+.nav-links{display:flex; gap:28px; font-size:.94rem; font-weight:500;}
+.nav-links a{position:relative; opacity:.85;}
+.nav-links a::after{content:''; position:absolute; left:0; bottom:-4px; width:0; height:2px; background:var(--magenta); transition:width .25s ease;}
+.nav-links a:hover::after{width:100%;}
+.nav-cta{background:var(--magenta); color:#fff; padding:8px 20px; border-radius:30px; font-weight:600; font-size:.9rem; white-space:nowrap; position:relative; overflow:hidden;}
+.nav-cta::before{content:''; position:absolute; inset:0; background:linear-gradient(120deg,transparent,rgba(255,255,255,.5),transparent); transform:translateX(-120%);}
+.nav-cta:hover::before{transform:translateX(120%); transition:transform .6s ease;}
+.menu-btn{display:none; background:none; border:none; font-size:1.3rem; color:var(--deep);}
+@media(max-width:840px){.nav-links{display:none;} .menu-btn{display:block;}}
+
+/* hero */
+.hero{position:relative; z-index:2; isolation:isolate; min-height:100svh; overflow:hidden; display:flex; align-items:center; background-color:#fff; background-image:linear-gradient(120deg,#fff 0%,#fffafd 52%,#fce7f0 100%);}
+.hero-content{position:relative; z-index:3; width:100%; max-width:1160px; margin:0 auto; padding:150px 24px 90px; color:var(--deep); display:grid; grid-template-columns:minmax(0,1fr) minmax(320px,.82fr); align-items:center; gap:clamp(40px,7vw,96px);}
+.hero-copy{min-width:0;}
+.tag{font-family:'Fraunces',serif; font-style:italic; color:var(--magenta); font-size:1.05rem; margin-bottom:14px; display:block;}
+.hero .tag{color:var(--magenta);}
+.hero h1{font-size:clamp(2.6rem,6vw,4.6rem); line-height:1; letter-spacing:-.02em; margin-bottom:20px; max-width:14ch;}
+.hero h1 em{font-style:italic; color:var(--magenta); font-weight:400;}
+.hero p{font-size:1.1rem; max-width:42ch; opacity:.9; margin-bottom:30px;}
+.btn-row{display:flex; gap:14px; flex-wrap:wrap;}
+.hero-gallery{position:relative; width:100%; max-width:470px; justify-self:end; overflow:hidden; background:#ff66a3; border:3px solid #000; box-shadow:12px 12px 0 #000; translate:-6px -6px; transition:border-color .3s ease,box-shadow .3s ease;}
+.hero-gallery:hover{border-color:#ff66a3; box-shadow:12px 12px 0 #ff66a3;}
+.gallery-frame{position:relative; overflow:hidden; aspect-ratio:4/5; background:#3a1728;}
+.gallery-frame img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center 58%; opacity:0; transform:scale(1.025); transition:opacity .8s ease,transform 5s ease;}
+.gallery-frame img.active{opacity:1; transform:scale(1);}
+.gallery-controls{display:flex; align-items:center; justify-content:space-between; gap:14px; padding:10px 14px 12px; background:rgba(255,255,255,.12); backdrop-filter:blur(12px);}
+.gallery-controls p{margin:0; color:#fff; font-size:.82rem; letter-spacing:.04em;}
+.gallery-controls strong{color:#ffc9dd;}
+.gallery-control.button{width:48px; min-width:48px; height:42px; padding:0 6px 8px; color:#fff;}
+.gallery-control .button-top{padding:6px;}
+.gallery-control svg{flex:0 0 20px; width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round;}
+@media(max-width:840px){.hero-content{grid-template-columns:1fr; max-width:700px; gap:34px; padding-top:140px;}.hero-gallery{justify-self:center; max-width:430px;}}
+@media(max-width:520px){.hero-content{padding:130px 22px 64px; gap:26px;}.gallery-frame{aspect-ratio:5/4;}}
+.btn{padding:15px 28px; border-radius:30px; font-weight:600; font-size:.95rem; display:inline-block; transition:transform .25s ease, box-shadow .25s ease; position:relative; overflow:hidden;}
+.btn-primary{background:var(--magenta); color:#fff; box-shadow:0 10px 26px rgba(200,29,103,.4);}
+.btn-primary:hover{transform:translateY(-3px); box-shadow:0 16px 34px rgba(200,29,103,.5);}
+.btn-ghost{background:rgba(255,255,255,.12); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,.5); color:#fff;}
+.btn-ghost:hover{transform:translateY(-3px); background:rgba(255,255,255,.22);}
+
+/* Uiverse.io by njesenberger, layered press-down buttons, recolored for Forever Florals */
+.button{-webkit-appearance:none; appearance:none; position:relative; display:inline-block; vertical-align:middle; border:0; padding:0 8px 12px; min-width:10em; box-sizing:border-box; background:transparent; font:inherit; font-weight:600; text-align:center; text-decoration:none; cursor:pointer;}
+.button-top{display:flex; align-items:center; justify-content:center; gap:10px; position:relative; z-index:0; padding:8px 16px; transform:translateY(0); text-align:center; color:#fff; text-shadow:0 -1px rgba(0,0,0,.25); transition:transform .2s; user-select:none;}
+.button-top::after{content:''; position:absolute; z-index:-1; inset:0; border-radius:4px; width:100%; height:100%; box-sizing:content-box; background-image:radial-gradient(#cd3f64,#9d3656); box-shadow:inset 0 0 0 1px rgba(255,255,255,.2),0 1px 2px 1px rgba(255,255,255,.2); transition:border-radius .2s,padding .2s,width .2s,transform .2s;}
+.button-bottom{position:absolute; z-index:-1; bottom:4px; left:4px; border-radius:8px / 16px 16px 8px 8px; padding-top:6px; width:calc(100% - 8px); height:calc(100% - 10px); box-sizing:content-box; background-color:#803; background-image:radial-gradient(4px 8px at 4px calc(100% - 8px),rgba(255,255,255,.25),transparent),radial-gradient(4px 8px at calc(100% - 4px) calc(100% - 8px),rgba(255,255,255,.25),transparent),radial-gradient(16px at -4px 0,white,transparent),radial-gradient(16px at calc(100% + 4px) 0,white,transparent); box-shadow:0 2px 3px rgba(0,0,0,.5),inset 0 -1px 3px 3px rgba(0,0,0,.4); transition:border-radius .2s,padding-top .2s;}
+.button-base{position:absolute; z-index:-2; top:4px; left:0; border-radius:12px; width:100%; height:calc(100% - 4px); background-color:rgba(0,0,0,.15); box-shadow:0 1px 1px rgba(255,255,255,.75),inset 0 2px 2px rgba(0,0,0,.25);}
+.button:active .button-top{transform:translateY(6px);}
+.button:active .button-top::after{border-radius:6px; padding:0 2px;}
+.button:active .button-bottom{border-radius:10px 10px 8px 8px / 8px; padding-top:0;}
+.button:focus-visible{outline:2px solid #ffc9dd; outline-offset:4px;}
+.button-top svg{flex:0 0 20px; width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round;}
+.button.small{min-width:8em; font-size:.9rem;}
+.button.small .button-top{padding:7px 12px;}
+.button:disabled{cursor:not-allowed; opacity:.65;}
+@media(max-width:520px){.button{min-width:9em;}}
+
+/* marquee */
+.marquee{overflow:hidden; padding:16px 0; border-top:1px solid rgba(92,14,51,.12); border-bottom:1px solid rgba(92,14,51,.12); background:rgba(255,255,255,.35); backdrop-filter:blur(6px);}
+.marquee-track{display:flex; gap:44px; white-space:nowrap; width:max-content; animation:marq 26s linear infinite;}
+.marquee-track span{font-family:'Fraunces',serif; font-style:italic; font-size:1.1rem; color:var(--deep); display:flex; align-items:center; gap:10px; opacity:.8;}
+.marquee-track svg{width:16px; height:16px; fill:var(--magenta); color:var(--magenta); opacity:.7;}
+@keyframes marq{from{transform:translateX(0);} to{transform:translateX(-50%);}}
+
+.reveal{opacity:0; transform:translateY(26px) scale(.97); transition:opacity .7s ease, transform .7s ease;}
+.reveal.in{opacity:1; transform:translateY(0) scale(1);}
+.sr-only{position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;}
+
+.sec{padding:76px 0;}
+.sec-head{max-width:600px; margin:0 auto 44px; text-align:center;}
+.sec-head h2{font-size:clamp(1.9rem,3.6vw,2.5rem); letter-spacing:-.02em; margin-bottom:12px;}
+.sec-head p{opacity:.72;}
+
+/* product tiles (best sellers style) */
+.grid-cards{display:grid; grid-template-columns:repeat(3,1fr); gap:22px;}
+@media(max-width:900px){.grid-cards{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:560px){.grid-cards{grid-template-columns:1fr;}}
+.card{position:relative; min-height:320px; aspect-ratio:1/1; overflow:hidden; background:#3a1728; border:0; border-radius:6px; box-shadow:none; color:inherit; text-decoration:none; transition:transform .35s ease; isolation:isolate; cursor:pointer;}
+.grid-cards > .card:not(.custom){background:#ff66a3; border:3px solid #000; box-shadow:12px 12px 0 #000; translate:-6px -6px; transition:border-color .3s ease,box-shadow .3s ease;}
+.grid-cards > .card:not(.custom):hover{border-color:#ff66a3; box-shadow:12px 12px 0 #ff66a3; transform:none;}
+.card::before{content:''; position:absolute; inset:0; z-index:1; background:linear-gradient(180deg,rgba(28,8,19,.02) 24%,rgba(28,8,19,.24) 48%,rgba(28,8,19,.9) 100%); pointer-events:none;}
+.card:hover{transform:none; box-shadow:none;}
+.card-art{position:absolute; inset:0; height:auto; background-size:cover; background-position:center 62%; transition:transform .6s ease;}
+.card-art svg{display:none;}
+.card:hover .card-art{transform:none;}
+.card:nth-child(1) .card-art{background-image:url('/images/IMG_3108.jpeg');}
+.card:nth-child(2) .card-art{background-image:url('/images/IMG_2346.jpg');}
+.card:nth-child(3) .card-art{background-image:url('/images/IMG_2347.jpg');}
+.card:nth-child(4) .card-art{background-image:url('/images/IMG_2349.jpg');}
+.card:nth-child(5) .card-art{background-image:url('/images/pink-rose-bouquet-18.png');}
+.card:nth-child(6) .card-art{background-image:url('/images/IMG_3110.jpeg');}
+.card:nth-child(7) .card-art{background-image:url('/images/IMG_2350.jpg');}
+.card-body{position:absolute; z-index:2; inset:auto 0 0; padding:22px 24px 24px; color:#fff;}
+.card-order-link{position:absolute; inset:0; z-index:3;}
+.card-order-link:focus-visible{outline:4px solid #fff; outline-offset:-7px;}
+.card .count{font-family:'Fraunces',serif; font-style:italic; font-size:1.4rem; color:#fff;}
+.card .price{font-size:1.7rem; font-weight:800; color:#ffc9dd; margin:6px 0 8px;}
+.card p{font-size:.88rem; color:rgba(255,255,255,.9); margin-bottom:10px;}
+.card .view{font-size:.85rem; font-weight:600; color:#fff; border-bottom:1px solid rgba(255,255,255,.78); padding-bottom:2px;}
+.card.custom{background:#3a1728; border:0;}
+.card.custom .count,.card.custom .price{color:#fff;}
+.card.custom p{color:rgba(255,255,255,.9);}
+.card.custom .view{color:#fff; border-color:rgba(255,255,255,.78);}
+
+/* promo alternating blocks */
+.promo{display:grid; grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr); gap:clamp(12px,2vw,22px); align-items:center; max-width:1000px; margin-inline:auto; padding:40px 0;}
+.promo.reverse .promo-art{order:2;}
+@media(max-width:840px){.promo{grid-template-columns:minmax(0,1fr); max-width:560px; gap:22px; text-align:center;} .promo.reverse .promo-art{order:0;}}
+.promo-art{display:flex; justify-content:center;}
+.promo-art .panel-art{width:100%; max-width:340px; aspect-ratio:1/.8; border-radius:28px; background:var(--glass); backdrop-filter:blur(18px); border:1px solid var(--glass-brd); display:flex; align-items:center; justify-content:center;}
+.promo-art svg{width:52%;}
+.promo-text .tag{margin-bottom:10px;}
+.promo-text h3{font-size:clamp(1.5rem,3vw,2rem); margin-bottom:14px;}
+.promo-text p{opacity:.78; max-width:42ch; margin-bottom:18px;}
+@media(max-width:840px){.promo-text p{margin-inline:auto;}}
+.handcrafted-card{width:100%; max-width:460px; min-width:0; min-height:250px; justify-self:start; overflow:hidden; background:#ff66a3; border:3px solid #000; box-shadow:12px 12px 0 #000; translate:-6px -6px; transition:border-color .3s ease,box-shadow .3s ease;}
+.promo:first-child .handcrafted-card{max-width:460px;}
+.promo.reverse .handcrafted-card{max-width:410px;}
+.handcrafted-card:hover{border-color:#ff66a3; box-shadow:12px 12px 0 #ff66a3;}
+.handcrafted-card .tag{height:32px; margin:0; padding:5px 12px; background:#fff; border-bottom:3px solid #000; color:#000; font-family:'Sora',sans-serif; font-size:.9rem; font-style:normal; font-weight:800;}
+.handcrafted-card h3{margin:0; padding:14px 18px 8px; color:#000; font-size:clamp(1.45rem,2.5vw,1.8rem); line-height:1.15;}
+.handcrafted-card p{max-width:none; margin:0; padding:0 18px 12px; color:#000; font-size:.9rem; font-weight:600; opacity:1;}
+.handcrafted-card .button{margin:0 12px 8px; min-width:0;}
+.handcrafted-card .button-top{color:#000; text-shadow:none;}
+.handcrafted-card .button-top::after{border-radius:0; background:#4ade80; box-shadow:3px 3px 0 #000;}
+.handcrafted-card .button-bottom,.handcrafted-card .button-base{display:none;}
+.handcrafted-card .button:hover .button-top{transform:translate(1.5px,1.5px);}
+.handcrafted-card .button:active .button-top{transform:translate(3px,3px);}
+.handcrafted-card .button:focus-visible{outline-color:#000;}
+@media(max-width:840px){.handcrafted-card{justify-self:center;}}
+.handcrafted-slideshow{position:relative; width:100%; max-width:390px; aspect-ratio:1/.8; overflow:hidden; background:#ff66a3; border:3px solid #000; box-shadow:12px 12px 0 #000; translate:-6px -6px; transition:border-color .3s ease,box-shadow .3s ease;}
+.promo:first-child .handcrafted-slideshow{aspect-ratio:1/.95;}
+.handcrafted-slideshow:hover{border-color:#ff66a3; box-shadow:12px 12px 0 #ff66a3;}
+.handcrafted-slideshow img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0; transition:opacity .8s ease;}
+.handcrafted-slideshow img.active{opacity:1;}
+@media(prefers-reduced-motion:reduce){.handcrafted-slideshow img{transition:none;}}
+.special-request-photo{width:100%; max-width:350px; aspect-ratio:4/5; object-fit:cover; background:#ff66a3; border:3px solid #000; box-shadow:12px 12px 0 #000; translate:-6px -6px; transition:border-color .3s ease,box-shadow .3s ease;}
+.special-request-photo:hover{border-color:#ff66a3; box-shadow:12px 12px 0 #ff66a3;}
+@media(max-width:840px){.handcrafted-card,.handcrafted-slideshow,.special-request-photo{max-width:min(100%,420px); translate:0 0; box-shadow:8px 8px 0 #000;}.handcrafted-card:hover,.handcrafted-slideshow:hover,.special-request-photo:hover{box-shadow:8px 8px 0 #ff66a3;}}
+
+/* customize */
+.two-col{display:grid; grid-template-columns:1fr 1fr; gap:28px;}
+@media(max-width:840px){.two-col{grid-template-columns:1fr;}}
+.panel{background:var(--glass); backdrop-filter:blur(18px) saturate(160%); -webkit-backdrop-filter:blur(18px) saturate(160%); border:1px solid var(--glass-brd); border-radius:24px; padding:34px;}
+.customize-card{padding:36px; background:#ff66a3; border:3px solid #000; box-shadow:12px 12px 0 #000; transition:border-color .3s ease,box-shadow .3s ease;}
+.customize-card .panel{padding:0; background:transparent; border:0; border-radius:0; backdrop-filter:none; -webkit-backdrop-filter:none;}
+@media(max-width:560px){.customize-card{padding:22px 18px; box-shadow:8px 8px 0 #000;}}
+.panel h3{font-size:1.3rem; margin-bottom:18px; font-style:italic;}
+.chip-row{display:flex; flex-wrap:wrap; gap:10px;}
+.chip{background:rgba(255,255,255,.6); border:1px solid rgba(92,14,51,.15); border-radius:30px; padding:9px 16px; font-size:.88rem; display:flex; align-items:center; gap:8px; transition:transform .2s ease, background .2s ease;}
+.chip:hover{transform:translateY(-2px); background:#fff;}
+.chip b{color:var(--magenta);}
+.topper-option{position:relative; isolation:isolate; display:inline-flex; align-items:center; gap:.35em; padding:.45rem .7rem; color:#6f35b5; background:#fff; border:2px solid #6f35b5; border-radius:2px; box-shadow:0 2px 8px rgba(0,0,0,.12); cursor:pointer; font-size:.72rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; transition:color .3s ease,border-color .3s ease,box-shadow .3s ease,transform .3s ease;}
+.topper-option::before{position:absolute; z-index:-1; inset:0 50%; content:''; background:#6f35b5; opacity:0; transition:inset .35s ease,opacity .35s ease;}
+.topper-option input{position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; clip-path:inset(50%); border:0;}
+.topper-option b{color:inherit;}
+.topper-option:hover,.topper-option:focus-within,.topper-option:has(input:checked){color:#fff; border-color:#9a63d2; box-shadow:0 3px 10px rgba(111,53,181,.28);}
+.topper-option:hover::before,.topper-option:focus-within::before,.topper-option:has(input:checked)::before{inset:0; opacity:1;}
+.topper-option:active{transform:scale(.96);}
+.topper-option:has(input:focus-visible){outline:3px solid var(--deep); outline-offset:3px;}
+.customization-status{min-height:1.4em;margin:10px 0 0;font-size:.78rem;font-weight:600;color:var(--deep);}
+.swatches{display:flex; gap:18px; margin-top:6px;}
+.swatch{text-align:center; font-size:.85rem;}
+.dot{width:48px; height:48px; border-radius:50%; margin:0 auto 8px; border:1px solid rgba(92,14,51,.15); box-shadow:inset 0 4px 8px rgba(255,255,255,.5), 0 4px 10px rgba(0,0,0,.08); transition:transform .25s ease;}
+.dot.texture{background-image:url('/images/wrap-texture.jpg'); background-size:cover; background-position:center;}
+.swatch:hover .dot{transform:scale(1.12) rotate(6deg);}
+
+/* delivery zone */
+.zone-deep{background:linear-gradient(160deg,var(--deep),#380a21); color:#fff; border-radius:36px; padding:64px 40px; margin:0 24px;}
+.zone-deep .sec-head h2{color:#fff;}
+.zone-deep .sec-head p{color:#f0cfe0;}
+.zone-deep .sec-head .tag{color:var(--gold);}
+.grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:20px; max-width:1080px; margin:0 auto;}
+@media(max-width:840px){.grid-3{grid-template-columns:1fr;}}
+.deliver-card{position:relative; min-width:0; padding:0; border:3px solid #141414; background-color:#141414; background-image:linear-gradient(135deg,transparent 18.75%,#f3a8c1 0 31.25%,transparent 0),repeating-linear-gradient(45deg,#f3a8c1 0 12.5%,#141414 0 18.75%); background-size:60px 60px; box-shadow:rgba(142,142,142,.3) 0 30px 30px -10px; transform-style:preserve-3d; transition:transform .5s ease,background-position .5s ease;}
+.deliver-card:hover{background-position:-70px 70px,-70px 70px; transform:rotate3d(.5,1,0,16deg);}
+.delivery-content{position:relative; min-height:185px; height:100%; padding:54px 22px 22px; background:#ff8fba; transform-style:preserve-3d; transition:transform .5s ease;}
+.delivery-badge{position:absolute; top:14px; right:14px; min-width:64px; padding:7px 8px; color:#ff8fba; background:#141414; border:1px solid #ff8fba; font-size:.62rem; font-weight:800; text-align:center; letter-spacing:.08em; transform:translate3d(0,0,50px); box-shadow:0 12px 10px -8px rgba(20,20,20,.35);}
+.deliver-card h3{display:inline-block; margin:0 0 10px; color:#141414; font-size:1.15rem; font-style:italic; font-weight:900; transform:translate3d(0,0,35px); transition:transform .5s ease;}
+.deliver-card .row{display:flex; justify-content:space-between; gap:12px; font-size:.92rem; padding:8px 0; color:#141414; border-bottom:1px dashed rgba(20,20,20,.4); transform:translate3d(0,0,24px); transition:transform .5s ease;}
+.deliver-card .row:last-child{border-bottom:none;}
+.deliver-card:hover h3{transform:translate3d(0,0,48px);}
+.deliver-card:hover .row{transform:translate3d(0,0,38px);}
+.free{color:#6f35b5; font-weight:800;}
+@media(max-width:560px){.zone-deep{padding:42px 20px; margin:0 10px;}.deliver-card:hover{transform:none;}.deliver-card:hover h3{transform:translate3d(0,0,35px);}.deliver-card:hover .row{transform:translate3d(0,0,24px);}}
+
+/* occasions */
+.occ-grid{display:grid; grid-template-columns:repeat(6,1fr); gap:18px;}
+@media(max-width:900px){.occ-grid{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:520px){.occ-grid{grid-template-columns:repeat(2,1fr);}}
+.occ-item{text-align:center; font-size:.85rem; font-weight:600;}
+.occ-icon{position:relative; isolation:isolate; overflow:hidden; width:74px; height:74px; margin:0 auto 10px; background:#fff; border:3px solid var(--magenta); border-radius:2px; box-shadow:0 2px 10px rgba(0,0,0,.16),0 3px 6px rgba(0,0,0,.1); display:flex; align-items:center; justify-content:center; transition:transform .3s ease,border-color .3s ease,box-shadow .3s ease;}
+.occ-icon::before{position:absolute; z-index:-1; inset:0 50%; content:''; background:var(--magenta); opacity:0; transition:inset .5s ease,opacity .5s ease;}
+.occ-item:hover .occ-icon{transform:scale(.96); border-color:var(--magenta); box-shadow:0 3px 12px rgba(200,29,103,.3);}
+.occ-item:hover .occ-icon::before{inset:0; opacity:1;}
+.occ-icon svg{position:relative; z-index:1; width:32px; height:32px; stroke:var(--magenta); fill:none; stroke-width:1.6; transition:stroke .3s ease;}
+.occ-item:hover .occ-icon svg{stroke:#fff;}
+
+/* newsletter */
+.newsletter{border-radius:28px; margin:0 24px; padding:50px 32px; text-align:center; background:var(--glass); backdrop-filter:blur(18px); border:1px solid var(--glass-brd);}
+.newsletter h2{margin-bottom:10px;}
+.newsletter p{opacity:.75; margin-bottom:24px;}
+.nl-form{display:flex; gap:10px; max-width:420px; margin:0 auto; flex-wrap:wrap; justify-content:center;}
+.nl-form input{flex:1; min-width:200px; padding:13px 18px; border-radius:30px; border:1px solid rgba(92,14,51,.2); background:rgba(255,255,255,.7); font-family:'Sora',sans-serif;}
+.order-form{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; max-width:760px; margin:0 auto; text-align:left;}
+.order-field{display:grid; align-content:start; gap:8px; color:#fff; font-size:.88rem; font-weight:600;}
+.order-field-label{justify-self:start; padding:3px 9px; background:#000; color:#fff; font-family:monospace; font-size:.8rem; font-weight:700; transform:rotate(-1deg); transition:transform .3s cubic-bezier(.25,.8,.25,1),background-color .3s cubic-bezier(.25,.8,.25,1);}
+.order-field:focus-within .order-field-label{transform:rotate(0) scale(1.04); background:var(--magenta);}
+.order-field input,.order-field select,.order-field textarea{width:100%; min-height:48px; padding:12px 14px; border:3px solid #000; border-radius:0; outline:none; background:#fff; color:#000; font:700 16px/1.4 monospace; box-shadow:5px 5px 0 #000,10px 10px 0 var(--magenta); transition:border-color .3s cubic-bezier(.25,.8,.25,1),box-shadow .3s cubic-bezier(.25,.8,.25,1),transform .3s cubic-bezier(.25,.8,.25,1);}
+.order-field textarea{min-height:110px; resize:vertical;}
+.order-field input::placeholder,.order-field textarea::placeholder{color:#888; transition:color .3s ease;}
+.order-field input:focus-visible,.order-field select:focus-visible,.order-field textarea:focus-visible{border-color:var(--magenta);}
+.order-field.is-shaking{animation:field-glitch .3s cubic-bezier(.25,.8,.25,1) 1;}
+.order-field input:focus-visible::placeholder,.order-field textarea:focus-visible::placeholder{color:transparent;}
+@keyframes field-glitch{0%,100%{transform:translate(0);}20%{transform:translate(-2px,2px);}40%{transform:translate(-2px,-2px);}60%{transform:translate(2px,2px);}80%{transform:translate(2px,-2px);}}
+.order-field.full,.order-form .button,.order-form-note{grid-column:1/-1;}
+.order-form .button{justify-self:center; margin-top:6px;}
+.order-form-note{color:#fbdcea; text-align:center; font-size:.82rem;}
+@media(max-width:560px){.order-form{grid-template-columns:1fr;}.order-field.full,.order-form .button,.order-form-note{grid-column:auto;}}
+
+/* CTA */
+.cta{position:relative; border-radius:28px; padding:60px 32px; text-align:center; overflow:hidden; background:linear-gradient(135deg,var(--magenta),#8a1a55,var(--deep)); background-size:220% 220%; animation:gshift 12s ease infinite;}
+@keyframes gshift{0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;}}
+.cta h2{color:#fff; margin-bottom:12px; font-size:clamp(1.7rem,3.2vw,2.3rem);}
+.cta p{color:#fbdcea; margin-bottom:28px;}
+.cta .btn-primary{background:#fff; color:var(--deep); box-shadow:0 10px 26px rgba(0,0,0,.2);}
+
+/* footer */
+footer{padding:64px 0 30px; background:var(--deep); color:#f3d9e6; margin-top:40px;}
+.foot-grid{display:grid; grid-template-columns:1.3fr 1fr 1fr; gap:36px; padding-bottom:36px; border-bottom:1px solid rgba(255,255,255,.15);}
+@media(max-width:780px){.foot-grid{grid-template-columns:1fr; text-align:center;}}
+.foot-grid h4{font-family:'Fraunces',serif; font-style:italic; color:#fff; font-size:1.15rem; margin-bottom:14px;}
+.foot-grid p,.foot-grid a{font-size:.9rem; opacity:.85; display:block; margin-bottom:8px;}
+.foot-grid a:hover{opacity:1; text-decoration:underline;}
+.foot-grid .contact-link{display:inline-flex; align-items:center; margin:0 14px 8px 0;}
+.contact-icon{width:20px; height:20px; flex:0 0 20px; fill:currentColor;}
+.contact-icon.stroke{fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round;}
+.foot-bottom{text-align:center; font-size:.8rem; opacity:.6; padding-top:24px;}
+
+.mobile-panel{display:none; position:fixed; inset:0; z-index:120; background:rgba(255,243,246,.97); backdrop-filter:blur(10px); flex-direction:column; align-items:center; justify-content:center; gap:26px; font-size:1.3rem; font-family:'Fraunces',serif; font-style:italic;}
+.mobile-panel.open{display:flex;}
+.mobile-close{position:absolute; top:24px; right:26px; font-size:1.6rem; background:none; border:none; color:var(--deep);}
+</style>
+</head>
+<body>
+
+<div class="grain"></div>
+<div class="blobs"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
+
+<header id="header">
+  <div class="announce">🎀 <b>New:</b> Money Bouquets now available, every order handfolded to your specs</div>
+  <nav class="nav">
+    <div class="logo">
+      <img src="/images/forever-florals-logo.png" alt="Forever Florals" class="logo-img">
+    </div>
+    <div class="nav-links">
+      <a href="#bouquets">Bouquets</a>
+      <a href="#customize">Customize</a>
+      <a href="#delivery">Delivery</a>
+      <a href="#occasions">Occasions</a>
+      <a href="#contact">Contact</a>
+    </div>
+    <a href="/order.html" class="button small"><span class="button-top">Order Now<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span><span class="button-bottom" aria-hidden="true"></span><span class="button-base" aria-hidden="true"></span></a>
+    <button class="menu-btn" id="menuBtn" type="button" aria-label="Open navigation menu" aria-expanded="false">☰</button>
+  </nav>
+</header>
+
+<div class="mobile-panel" id="mobilePanel">
+  <button class="mobile-close" id="mobileClose" type="button" aria-label="Close navigation menu">✕</button>
+  <a href="#bouquets">Bouquets</a>
+  <a href="#customize">Customize</a>
+  <a href="#delivery">Delivery</a>
+  <a href="#occasions">Occasions</a>
+  <a href="#contact">Contact</a>
+</div>
+
+<section class="hero" id="heroSection">
+  <div class="hero-content">
+    <div class="hero-copy">
+      <span class="tag">ribbon roses, made to last</span>
+      <h1>Bouquets that <em>never die</em>, wrapped for the moment that matter.</h1>
+      <p>Handfolded eternal ribbon-rose bouquets, customized with toppers, colors, and details that make it unmistakably yours.</p>
+      <div class="btn-row">
+        <a href="#bouquets" class="button"><span class="button-top">See bouquets &amp; pricing<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span><span class="button-bottom" aria-hidden="true"></span><span class="button-base" aria-hidden="true"></span></a>
+        <a href="#customize" class="button"><span class="button-top">Customize yours<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span><span class="button-bottom" aria-hidden="true"></span><span class="button-base" aria-hidden="true"></span></a>
+      </div>
+    </div>
+    <aside class="hero-gallery" aria-label="Forever Florals bouquet gallery">
+      <div class="gallery-frame">
+        <img class="active" src="/images/IMG_2349.jpg" alt="Handcrafted ribbon rose bouquet in Forever Florals' collection" fetchpriority="high">
+        <img alt="" aria-hidden="true">
+      </div>
+      <div class="gallery-controls">
+        <button class="button gallery-control" type="button" id="galleryPrevious" aria-label="Show previous bouquet"><span class="button-top"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></span><span class="button-bottom" aria-hidden="true"></span><span class="button-base" aria-hidden="true"></span></button>
+        <p><strong id="galleryIndex">01</strong> / <span id="galleryCount">07</span></p>
+        <button class="button gallery-control" type="button" id="galleryNext" aria-label="Show next bouquet"><span class="button-top"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></span><span class="button-bottom" aria-hidden="true"></span><span class="button-base" aria-hidden="true"></span></button>
+      </div>
+      <span class="sr-only" id="galleryAnnouncement" aria-live="polite"></span>
+    </aside>
+    </div>
+</section>
+
+<div class="marquee">
+  <div class="marquee-track">
+    <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.2c-3.5 0-6.2-2-6.2-4.8 0-2.3 1.8-4.1 4-4.1 1 0 1.7.4 2.2 1.1.5-.7 1.3-1.1 2.2-1.1 2.2 0 4 1.8 4 4.1 0 2.8-2.7 4.8-6.2 4.8Z"/><path d="M12 15v6m0-3c-1.4-2-3-2.4-4.8-2.4.4 1.8 2 3 4.8 3m0-2c1.4-1.9 3-2.3 4.8-2.3-.4 1.8-2 2.9-4.8 2.9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Eternal ribbon roses</span>
+    <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.2c-3.5 0-6.2-2-6.2-4.8 0-2.3 1.8-4.1 4-4.1 1 0 1.7.4 2.2 1.1.5-.7 1.3-1.1 2.2-1.1 2.2 0 4 1.8 4 4.1 0 2.8-2.7 4.8-6.2 4.8Z"/><path d="M12 15v6m0-3c-1.4-2-3-2.4-4.8-2.4.4 1.8 2 3 4.8 3m0-2c1.4-1.9 3-2.3 4.8-2.3-.4 1.8-2 2.9-4.8 2.9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Handfolded to order</span>
+    <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.2c-3.5 0-6.2-2-6.2-4.8 0-2.3 1.8-4.1 4-4.1 1 0 1.7.4 2.2 1.1.5-.7 1.3-1.1 2.2-1.1 2.2 0 4 1.8 4 4.1 0 2.8-2.7 4.8-6.2 4.8Z"/><path d="M12 15v6m0-3c-1.4-2-3-2.4-4.8-2.4.4 1.8 2 3 4.8 3m0-2c1.4-1.9 3-2.3 4.8-2.3-.4 1.8-2 2.9-4.8 2.9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Fully customizable</span>
+    <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.2c-3.5 0-6.2-2-6.2-4.8 0-2.3 1.8-4.1 4-4.1 1 0 1.7.4 2.2 1.1.5-.7 1.3-1.1 2.2-1.1 2.2 0 4 1.8 4 4.1 0 2.8-2.7 4.8-6.2 4.8Z"/><path d="M12 15v6m0-3c-1.4-2-3-2.4-4.8-2.4.4 1.8 2 3 4.8 3m0-2c1.4-1.9 3-2.3 4.8-2.3-.4 1.8-2 2.9-4.8 2.9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Delivered with care</span>
+    <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.2c-3.5 0-6.2-2-6.2-4.8 0-2.3 1.8-4.1 4-4.1 1 0 1.7.4 2.2 1.1.5-.7 1.3-1.1 2.2-1.1 2.2 0 4 1.8 4 4.1 0 2.8-2.7 4.8-6.2 4.8Z"/><path d="M12 15v6m0-3c-1.4-2-3-2.4-4.8-2.4.4 1.8 2 3 4.8 3m0-2c1.4-1.9 3-2.3 4.8-2.3-.4 1.8-2 2.9-4.8 2.9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Eternal ribbon roses</span>
+    <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.2c-3.5 0-6.2-2-6.2-4.8 0-2.3 1.8-4.1 4-4.1 1 0 1.7.4 2.2 1.1.5-.7 1.3-1.1 2.2-1.1 2.2 0 4 1.8 4 4.1 0 2.8-2.7 4.8-6.2 4.8Z"/><path d="M12 15v6m0-3c-1.4-2-3-2.4-4.8-2.4.4 1.8 2 3 4.8 3m0-2c1.4-1.9 3-2.3 4.8-2.3-.4 1.8-2 2.9-4.8 2.9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Handfolded to order</span>
+    <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.2c-3.5 0-6.2-2-6.2-4.8 0-2.3 1.8-4.1 4-4.1 1 0 1.7.4 2.2 1.1.5-.7 1.3-1.1 2.2-1.1 2.2 0 4 1.8 4 4.1 0 2.8-2.7 4.8-6.2 4.8Z"/><path d="M12 15v6m0-3c-1.4-2-3-2.4-4.8-2.4.4 1.8 2 3 4.8 3m0-2c1.4-1.9 3-2.3 4.8-2.3-.4 1.8-2 2.9-4.8 2.9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Fully customizable</span>
+    <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.2c-3.5 0-6.2-2-6.2-4.8 0-2.3 1.8-4.1 4-4.1 1 0 1.7.4 2.2 1.1.5-.7 1.3-1.1 2.2-1.1 2.2 0 4 1.8 4 4.1 0 2.8-2.7 4.8-6.2 4.8Z"/><path d="M12 15v6m0-3c-1.4-2-3-2.4-4.8-2.4.4 1.8 2 3 4.8 3m0-2c1.4-1.9 3-2.3 4.8-2.3-.4 1.8-2 2.9-4.8 2.9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Delivered with care</span>
+  </div>
+</div>
+
+<section class="sec" id="bouquets">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="tag">best sellers</span>
+      <h2>Bouquets & pricing</h2>
+      <p>Every bouquet is built from hand-folded ribbon roses, chosen by count.</p>
+    </div>
+    <div class="grid-cards" data-order-products>
+      <div class="card reveal"><div class="card-art"><svg viewBox="0 0 24 24"><path d="M12 21s-6-3.8-8-7.5C2.3 10 3.5 7 6.4 6.5 8.5 6.1 10.4 7 12 9c1.6-2 3.5-2.9 5.6-2.5 2.9.5 4.1 3.5 2.4 7C18 17.2 12 21 12 21z" fill="#c81d67"/></svg></div><div class="card-body"><div class="count">9 ct</div><div class="price">$4,500</div><p>A sweet, everyday-sized bouquet.</p><span class="view">View details</span></div></div>
+      <div class="card reveal"><div class="card-art"><svg viewBox="0 0 24 24"><path d="M12 21s-6-3.8-8-7.5C2.3 10 3.5 7 6.4 6.5 8.5 6.1 10.4 7 12 9c1.6-2 3.5-2.9 5.6-2.5 2.9.5 4.1 3.5 2.4 7C18 17.2 12 21 12 21z" fill="#c81d67"/></svg></div><div class="card-body"><div class="count">15 ct</div><div class="price">$6,500</div><p>Full and generous, great for gifting.</p><span class="view">View details</span></div></div>
+      <div class="card reveal"><div class="card-art"><svg viewBox="0 0 24 24"><path d="M12 21s-6-3.8-8-7.5C2.3 10 3.5 7 6.4 6.5 8.5 6.1 10.4 7 12 9c1.6-2 3.5-2.9 5.6-2.5 2.9.5 4.1 3.5 2.4 7C18 17.2 12 21 12 21z" fill="#c81d67"/></svg></div><div class="card-body"><div class="count">24 ct</div><div class="price">$8,500</div><p>A statement bouquet for big occasions.</p><span class="view">View details</span></div></div>
+      <div class="card reveal"><div class="card-art"><svg viewBox="0 0 24 24"><path d="M12 21s-6-3.8-8-7.5C2.3 10 3.5 7 6.4 6.5 8.5 6.1 10.4 7 12 9c1.6-2 3.5-2.9 5.6-2.5 2.9.5 4.1 3.5 2.4 7C18 17.2 12 21 12 21z" fill="#c81d67"/></svg></div><div class="card-body"><div class="count">36 ct</div><div class="price">$10,000</div><p>Lush and show-stopping.</p><span class="view">View details</span></div></div>
+      <div class="card reveal"><div class="card-art"><svg viewBox="0 0 24 24"><path d="M12 21s-6-3.8-8-7.5C2.3 10 3.5 7 6.4 6.5 8.5 6.1 10.4 7 12 9c1.6-2 3.5-2.9 5.6-2.5 2.9.5 4.1 3.5 2.4 7C18 17.2 12 21 12 21z" fill="#c81d67"/></svg></div><div class="card-body"><div class="count">50 ct</div><div class="price">$15,000</div><p>Our grandest arrangement.</p><span class="view">View details</span></div></div>
+      <div class="card custom reveal"><div class="card-art"><svg viewBox="0 0 24 24"><path d="M4 12h16M4 12a2 2 0 1 0 0-4M4 12a2 2 0 1 1 0 4M20 12a2 2 0 1 0 0-4M20 12a2 2 0 1 1 0 4" stroke="#fff" stroke-width="1.6" fill="none"/></svg></div><div class="card-body"><div class="count">Money Bouquet</div><div class="price">Ask for a quote</div><p>Cash folded into roses, built from the note denominations you choose ($5,000, $2,000, $1,000, $500, $100 & $50 bills).</p><span class="view">Enquire</span></div></div>
+      <div class="card custom reveal"><div class="card-art"><svg viewBox="0 0 24 24"><path d="M12 3v18M3 12h18" stroke="#fff" stroke-width="1.6"/></svg></div><div class="card-body"><div class="count">Special Request</div><div class="price">Ask for a quote</div><p>Send inspo photos or a totally different idea and I'll recreate it.</p><span class="view">Enquire</span></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="customize">
+  <div class="wrap customize-card">
+    <div class="sec-head reveal">
+      <span class="tag">make it yours</span>
+      <h2>Customize your bouquet</h2>
+      <p>Add a finishing touch with toppers, then pick your wrap color.</p>
+    </div>
+    <div class="two-col">
+      <div class="panel reveal">
+        <h3>Toppers</h3>
+        <div class="chip-row">
+          <label class="topper-option"><input type="checkbox" name="toppers" value="Glitter ($300)">Glitter <b>$300</b></label>
+          <label class="topper-option"><input type="checkbox" name="toppers" value="Butterfly ($100 ea)">Butterfly <b>$100 ea</b></label>
+          <label class="topper-option"><input type="checkbox" name="toppers" value="Bow ($100 ea)">Bow <b>$100 ea</b></label>
+          <label class="topper-option"><input type="checkbox" name="toppers" value="Banner ($100 ea)">Banner <b>$100 ea</b></label>
+          <label class="topper-option"><input type="checkbox" name="toppers" value="Crown ($500)">Crown <b>$500</b></label>
+          <label class="topper-option"><input type="checkbox" name="toppers" value="Tiara ($1,000)">Tiara <b>$1,000</b></label>
+          <label class="topper-option"><input type="checkbox" name="toppers" value="Baby's breath ($800)">Baby's breath <b>$800</b></label>
+          <label class="topper-option"><input type="checkbox" name="toppers" value="Pearl Bows ($300 per)">Pearl Bows <b>$300 per</b></label>
+          <label class="topper-option"><input type="checkbox" name="toppers" value="Mesh wrapping ($800)">Mesh wrapping <b>$800</b></label>
+          <label class="topper-option"><input type="checkbox" name="toppers" value="Pins ($200)">Pins <b>$200</b></label>
+          <label class="topper-option"><input type="checkbox" name="toppers" value="Other (quote)">Other <b>quote</b></label>
+        </div>
+        <p class="customization-status" data-toppers-status aria-live="polite"></p>
+      </div>
+      <div class="panel reveal">
+        <h3>Wrapping included, pick one</h3>
+        <div class="swatches">
+          <div class="swatch"><div class="dot" style="background:#161016;"></div>Black</div>
+          <div class="swatch"><div class="dot" style="background:#ffffff;"></div>White</div>
+          <div class="swatch"><div class="dot" style="background:#f2a8c1;"></div>Pink</div>
+          <div class="swatch"><div class="dot texture"></div>Mesh</div>
+        </div>
+        <h3 style="margin-top:30px;">How pricing works</h3>
+        <p style="font-size:.92rem; opacity:.8;">Start with your bouquet size, then add any toppers you'd like. Standard black, white, or pink wrapping is already included in that price.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap">
+    <div class="promo reveal">
+      <div class="promo-art">
+        <div class="handcrafted-slideshow" role="region" aria-label="Forever Florals bouquet photos" aria-roledescription="carousel">
+          <img class="active" src="/images/IMG_2349.jpg" alt="Handcrafted ribbon rose bouquet">
+          <img alt="" aria-hidden="true">
+        </div>
+      </div>
+      <div class="promo-text handcrafted-card">
+        <span class="tag">handcrafted</span>
+        <h3>Roses that hold their shape, forever</h3>
+        <p>Each bloom is hand-folded from ribbon, built to keep its color and shape long after fresh flowers would fade, a keepsake as much as a gift.</p>
+        <a href="#bouquets" class="button"><span class="button-top">Shop bouquets<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span><span class="button-bottom" aria-hidden="true"></span><span class="button-base" aria-hidden="true"></span></a>
+      </div>
+    </div>
+    <div class="promo reverse reveal">
+      <div class="promo-art"><img class="special-request-photo" src="/images/ChatGPT%20Image%20Oct%204,%202026,%2010_11_12%20PM.png" alt="Forever Florals special-request bouquet inspiration"></div>
+      <div class="promo-text handcrafted-card">
+        <span class="tag">for the biggest moments</span>
+        <h3>Special requests, recreated with care</h3>
+        <p>Have an inspo photo, a color story, or something totally different in mind? Send it my way and we'll bring your idea to life. From choosing the ribbon colors and wrap to adding the finishing touches, I'll work with you to create a one-of-a-kind bouquet made from scratch for your special occasion.</p>
+        <a href="/order.html?product=special-request" class="button"><span class="button-top">Send your inspo<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span><span class="button-bottom" aria-hidden="true"></span><span class="button-base" aria-hidden="true"></span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="delivery">
+  <div class="wrap">
+    <div class="zone-deep">
+      <div class="sec-head reveal">
+        <span class="tag">getting it to you</span>
+        <h2>Delivery, shipping & pickup</h2>
+        <p>Wherever you are, there's a way to get your bouquet.</p>
+      </div>
+      <div class="grid-3">
+        <div class="deliver-card reveal"><div class="delivery-content"><span class="delivery-badge">LOCAL</span><h3>Face to face</h3><div class="row"><span>Ocho Rios</span><span class="free">Free</span></div><div class="row"><span>St. Ann's Bay</span><span>$500</span></div></div></div>
+        <div class="deliver-card reveal"><div class="delivery-content"><span class="delivery-badge">COURIER</span><h3>Shipping</h3><div class="row"><span>Knutsford Express</span><span class="free">Free</span></div></div></div>
+        <div class="deliver-card reveal"><div class="delivery-content"><span class="delivery-badge">COLLECT</span><h3>Pickup</h3><div class="row"><span>Address</span><span>Shared once confirmed</span></div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="occasions">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="tag">for every reason</span>
+      <h2>Made for the moment</h2>
+      <p>Ribbon roses for the days worth marking.</p>
+    </div>
+    <div class="occ-grid">
+      <div class="occ-item reveal"><div class="occ-icon"><svg viewBox="0 0 24 24"><path d="M3 20h18M4 20V11a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v9M12 10V4M9 6c0-2 3-2 3-4 0 2 3 2 3 4"/></svg></div>Birthdays</div>
+      <div class="occ-item reveal"><div class="occ-icon"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9.5-9C.7 8.2 2.2 4.8 5.6 4.2 8 3.8 10.3 5 12 7.3 13.7 5 16 3.8 18.4 4.2c3.4.6 4.9 4 3.1 7.8C19 16.5 12 21 12 21z"/></svg></div>Anniversaries</div>
+      <div class="occ-item reveal"><div class="occ-icon"><svg viewBox="0 0 24 24"><path d="M22 10L12 5 2 10l10 5 10-5zM6 12v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/></svg></div>Graduations</div>
+      <div class="occ-item reveal"><div class="occ-icon"><svg viewBox="0 0 24 24"><path d="M12 6a3 3 0 1 0-3-3M12 6a3 3 0 1 1 3-3M12 6v15M6 11h12M8 6h8v5H8z"/></svg></div>New Baby</div>
+      <div class="occ-item reveal"><div class="occ-icon"><svg viewBox="0 0 24 24"><path d="M12 2v4M8 4l1 3M16 4l-1 3M6 10c0 8 3 12 6 12s6-4 6-12"/></svg></div>Just Because</div>
+      <div class="occ-item reveal"><div class="occ-icon"><svg viewBox="0 0 24 24"><path d="M4 20c4-6 12-6 16 0M8 13c2-3 6-3 8 0M12 3v7"/></svg></div>Sympathy</div>
+    </div>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap">
+    <div class="newsletter reveal">
+      <h2>Stay in the loop</h2>
+      <p>Get first look at new topper styles, seasonal colors, and booking openings.</p>
+      <a href="https://instagram.com/43ver.florals" target="_blank" rel="noopener" class="button"><span class="button-top">Follow on Instagram<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span><span class="button-bottom" aria-hidden="true"></span><span class="button-base" aria-hidden="true"></span></a>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="contact">
+  <div class="wrap">
+    <div class="cta reveal">
+      <h2>Ready to build your bouquet?</h2>
+      <p>Send your size, toppers, wrap color, and delivery preference, inspo photos welcome for special requests.</p>
+      <a href="/order.html" class="button"><span class="button-top">Start an order<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span><span class="button-bottom" aria-hidden="true"></span><span class="button-base" aria-hidden="true"></span></a>
+      <p class="order-form-note">Prefer WhatsApp? <a href="https://wa.me/18765666651" target="_blank" rel="noopener" style="text-decoration:underline;">Message Forever Florals</a></p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <h4>Forever Florals</h4>
+        <p>Handcrafted eternal ribbon-rose bouquets, made to order and delivered with care across Jamaica.</p>
+      </div>
+      <div>
+        <h4>Quick Links</h4>
+        <a href="#bouquets">Bouquets</a>
+        <a href="#customize">Customize</a>
+        <a href="#delivery">Delivery</a>
+        <a href="#occasions">Occasions</a>
+      </div>
+      <div>
+        <h4>Get in Touch</h4>
+        <a class="contact-link" href="https://wa.me/18765666651" target="_blank" rel="noopener" aria-label="WhatsApp: (876) 566-6651"><svg class="contact-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.04 2a9.85 9.85 0 0 0-8.5 14.83L2.2 22l5.3-1.39A9.9 9.9 0 1 0 12.04 2Zm0 17.9a8 8 0 0 1-4.08-1.12l-.3-.18-3.15.83.84-3.07-.2-.32A8.03 8.03 0 1 1 12.04 19.9Zm4.4-6.02c-.24-.12-1.43-.7-1.65-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.18-.71-.63-1.19-1.42-1.33-1.66-.14-.24-.01-.37.11-.49.1-.1.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.47-.4-.41-.54-.42h-.46c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.69 2.58 4.1 3.62.57.25 1.02.4 1.37.5.58.18 1.1.15 1.52.09.46-.07 1.43-.58 1.63-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28Z"/></svg></a>
+        <a class="contact-link" href="https://instagram.com/43ver.florals" target="_blank" rel="noopener" aria-label="Instagram: @43ver.florals"><svg class="contact-icon stroke" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.8" r=".8" fill="currentColor" stroke="none"/></svg></a>
+        <a class="contact-link" href="https://tiktok.com/@43ver.floralsja" target="_blank" rel="noopener" aria-label="TikTok: @43ver.floralsja"><svg class="contact-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.6 7.1a6.1 6.1 0 0 1-4.1-1.6v8.1a5.6 5.6 0 1 1-5.6-5.6c.4 0 .8 0 1.2.1v3.1a2.6 2.6 0 1 0 1.5 2.4V2.5h3.1c.3 2.3 1.9 4.2 4.1 4.7v3.2a9.3 9.3 0 0 1-1.2-.3Z"/></svg></a>
+        <a class="contact-link" href="mailto:Foreverflorals.ltd@gmail.com" aria-label="Email: Foreverflorals.ltd@gmail.com"><svg class="contact-icon stroke" viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="2"/><path d="m3.5 6 8.5 7 8.5-7"/></svg></a>
+      </div>
+    </div>
+    <div class="foot-bottom">© 2026 Forever Florals · Ocho Rios & St. Ann's Bay, Jamaica</div>
+  </div>
+</footer>
+
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>

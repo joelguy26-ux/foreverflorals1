@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#5c0e33">
+  <meta name="description" content="Choose your Forever Florals bouquets, customize your order, and send your enquiry.">
+  <title>Build Your Order | Forever Florals</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,0..144,500;1,0..144,600&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--blush:#fff3f6;--magenta:#c81d67;--deep:#5c0e33;--ink:#2c0f1e;--pink:#ff66a3;box-sizing:border-box}
+    *,*::before,*::after{box-sizing:inherit}
+    body{min-height:100vh;margin:0;background:linear-gradient(145deg,#fff3f6,#fce7f0);color:var(--ink);font:400 16px/1.6 'Sora',sans-serif}
+    a{color:inherit;text-decoration:none}
+    button,input,select,textarea{font:inherit}
+    .wrap{width:min(1120px,calc(100% - 40px));margin:0 auto}
+    .site-header{padding:14px 0}
+    .nav{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:8px 20px;background:rgba(244,160,193,.94);border:1px solid #fff;border-radius:18px}
+    .logo{height:42px;width:205px;overflow:hidden}
+    .logo img{height:76px;width:auto;max-width:none;transform:translateY(-16px) scale(1.1);transform-origin:left center}
+    .nav-actions{display:flex;align-items:center;gap:18px;font-weight:700}
+    .nav-actions .cart-nav-button{display:flex;justify-content:center;align-items:center;padding:10px 15px;gap:10px;background-color:#181717;outline:3px solid #181717;outline-offset:-3px;border-radius:5px;border:none;color:#fff;cursor:pointer;transition:400ms}
+    .cart-nav-button .text,.cart-nav-button [data-cart-count]{color:#fff;font-size:1em;font-weight:700;transition:400ms}
+    .nav-actions .cart-nav-button:hover,.nav-actions .cart-nav-button:focus-visible{background-color:transparent;color:#181717}
+    .cart-nav-button:hover .text,.cart-nav-button:hover [data-cart-count],.cart-nav-button:focus-visible .text,.cart-nav-button:focus-visible [data-cart-count]{color:#181717}
+    main{padding:36px 0 76px}
+    .page-heading{text-align:center;margin:0 auto 32px;max-width:650px}
+    .tag{color:var(--magenta);font:italic 1.05rem 'Fraunces',serif}
+    h1,h2,h3{font-family:'Fraunces',serif;line-height:1.15}
+    h1{margin:8px 0 12px;font-size:clamp(2.2rem,5vw,3.4rem);color:var(--deep)}
+    .page-heading p{margin:0;opacity:.78}
+    .order-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:28px;align-items:start}
+    .panel{min-width:0;padding:28px;background:#ff66a3;border:3px solid #000;box-shadow:10px 10px 0 #000}
+    .panel h2{margin:0 0 18px;font-size:1.7rem}
+    .cart-list{display:grid;gap:12px}
+    .empty-cart{padding:20px;background:rgba(255,255,255,.7);border:2px dashed rgba(0,0,0,.35);text-align:center}
+    .empty-cart p{margin:0 0 10px}
+    .empty-cart a{color:var(--deep);font-weight:800;text-decoration:underline}
+    .cart-item{display:grid;grid-template-columns:76px minmax(0,1fr);gap:12px;padding:10px;background:rgba(255,255,255,.78);border:2px solid #000}
+    .cart-item img{width:76px;height:76px;object-fit:cover;background:#f3a8c1}
+    .cart-item-title{font-weight:800}
+    .cart-item-price{font-size:.9rem;opacity:.82}
+    .cart-controls{display:flex;align-items:center;gap:8px;margin-top:8px}
+    .cart-controls button{width:30px;height:30px;border:2px solid #6f35b5;background:#fff;color:#6f35b5;font-weight:800;cursor:pointer}
+    .cart-controls button:hover,.cart-controls button:focus-visible{background:#6f35b5;color:#fff}
+    .cart-controls .remove{width:auto;margin-left:auto;padding:0 8px;border-color:#000;color:#000;font-size:.75rem}
+    .cart-summary{display:flex;justify-content:space-between;gap:10px;margin:18px 0 0;padding-top:14px;border-top:2px solid #000;font-weight:800}
+    .cart-note,.help-note{font-size:.82rem;opacity:.85}
+    .cart-message{min-height:1.5em;color:var(--deep);font-size:.85rem;font-weight:700}
+    .order-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+    .field{display:grid;align-content:start;gap:6px;min-width:0;font-size:.85rem;font-weight:700}
+    .field.full,.fieldset.full,.submit-row{grid-column:1/-1}
+    .field input,.field select,.field textarea{width:100%;min-height:46px;padding:10px 12px;border:2px solid #000;border-radius:0;background:#fff;color:#171017}
+    .field textarea{min-height:105px;resize:vertical}
+    .field input:focus-visible,.field select:focus-visible,.field textarea:focus-visible,.field input:focus,.field select:focus,.field textarea:focus{outline:3px solid #6f35b5;outline-offset:2px}
+    .field input[type=file]{padding:8px;font-size:.78rem}
+    .fieldset{margin:4px 0 0;padding:14px;border:2px solid #000}
+    .fieldset legend{padding:0 6px;font-weight:800}
+    .check-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+    .check-option{display:flex;align-items:flex-start;gap:8px;padding:8px;background:rgba(255,255,255,.72);font-size:.78rem;font-weight:600}
+    .check-option input{margin-top:3px;accent-color:#6f35b5}
+    .check-option b{margin-left:auto;white-space:nowrap}
+    .submit-row{display:grid;justify-items:center;gap:10px;margin-top:8px}
+    .submit-button{padding:12px 20px;border:3px solid #000;background:#4ade80;box-shadow:4px 4px 0 #000;color:#000;font-weight:800;cursor:pointer}
+    .submit-button:hover:not(:disabled){transform:translate(2px,2px);box-shadow:2px 2px 0 #000}
+    .submit-button:disabled{cursor:not-allowed;opacity:.6}
+    .status{min-height:1.5em;margin:0;text-align:center;color:var(--deep);font-size:.82rem}
+    .form-error{color:#7b092f}
+    .whatsapp{font-size:.82rem}
+    .whatsapp a{text-decoration:underline;font-weight:800}
+    .field.is-shaking{animation:field-glitch .3s cubic-bezier(.25,.8,.25,1) 1}
+    @keyframes field-glitch{0%,100%{transform:translate(0)}20%{transform:translate(-2px,2px)}40%{transform:translate(-2px,-2px)}60%{transform:translate(2px,2px)}80%{transform:translate(2px,-2px)}}
+    [hidden]{display:none!important}
+    @media(max-width:800px){.order-layout{grid-template-columns:1fr}.panel{padding:24px}}
+    @media(max-width:520px){.wrap{width:min(100% - 28px,1120px)}.nav{padding:7px 12px}.logo{width:130px}.logo img{height:60px;transform:translateY(-11px)}.nav-actions{gap:10px;font-size:.85rem}.order-fields{grid-template-columns:1fr}.field.full,.fieldset.full,.submit-row{grid-column:auto}.check-grid{grid-template-columns:1fr}.panel{padding:20px;box-shadow:7px 7px 0 #000}}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav wrap" aria-label="Main navigation">
+      <a class="logo" href="/" aria-label="Forever Florals home"><img src="/images/forever-florals-logo.png" alt="Forever Florals"></a>
+      <div class="nav-actions"><a href="/#bouquets">Continue shopping</a><a class="cart-nav-button" href="#cart" aria-label="Cart"><span class="text">Cart</span><span data-cart-count>0</span></a></div>
+    </nav>
+  </header>
+  <main class="wrap">
+    <header class="page-heading">
+      <span class="tag">made for your moment</span>
+      <h1>Build your bouquet order</h1>
+      <p>Add one or more bouquets, choose your custom details, and share how you would like to receive your order. We will confirm pricing and availability by email.</p>
+    </header>
+
+    <form id="orderForm" class="order-form" action="#" method="POST" enctype="multipart/form-data" novalidate>
+      <input type="hidden" name="_subject" value="New Forever Florals order enquiry">
+      <input type="hidden" name="order_summary" data-order-summary>
+      <div class="order-layout">
+        <section class="panel" id="cart" aria-labelledby="cartHeading">
+          <h2 id="cartHeading">Your cart</h2>
+          <div class="cart-list" data-cart-items aria-live="polite"></div>
+          <div class="cart-summary"><span>Bouquet subtotal</span><span data-cart-subtotal>$0</span></div>
+          <p class="cart-note">Subtotal includes priced bouquets only. Custom bouquets, add-ons, and delivery charges are confirmed with you before payment.</p>
+          <p class="cart-message" data-cart-message role="status"></p>
+          <div class="empty-cart" data-empty-cart hidden><p>Your cart is empty.</p><a href="/#bouquets">Browse bouquets</a></div>
+        </section>
+
+        <section class="panel" aria-labelledby="detailsHeading">
+          <h2 id="detailsHeading">Order details</h2>
+          <div class="order-fields">
+            <label class="field"><span>Your name *</span><input name="name" autocomplete="name" maxlength="100" required></label>
+            <label class="field"><span>Email address *</span><input type="email" name="email" autocomplete="email" maxlength="254" required></label>
+            <label class="field"><span>Phone / WhatsApp *</span><input type="tel" name="phone" autocomplete="tel" maxlength="40" required></label>
+            <label class="field"><span>Date needed *</span><input type="date" name="date_needed" data-date-needed required></label>
+            <label class="field"><span>Occasion</span><select name="occasion"><option value="">Choose later</option><option>Birthday</option><option>Anniversary</option><option>Graduation</option><option>New baby</option><option>Just because</option><option>Sympathy</option><option>Other</option></select></label>
+            <label class="field"><span>Wrap color / style *</span><select name="wrap_color" required><option value="">Choose a wrap</option><option>Black</option><option>White</option><option>Pink</option><option>Mesh texture</option></select></label>
+            <label class="field full"><span>Delivery or pickup *</span><select name="delivery" data-delivery required><option value="">Choose an option</option><option>Ocho Rios, face-to-face (free)</option><option>St. Ann's Bay, face-to-face ($500)</option><option>Knutsford Express shipping (free to courier)</option><option>Pickup</option></select></label>
+            <label class="field full" data-delivery-details hidden><span>Delivery address, courier branch, or pickup details *</span><textarea name="delivery_details" maxlength="1000" placeholder="Add the address or branch and any helpful instructions."></textarea></label>
+
+            <fieldset class="fieldset full">
+              <legend>Choose toppers and extras</legend>
+              <div class="check-grid">
+                <label class="check-option"><input type="checkbox" name="toppers" value="Glitter ($300)">Glitter <b>$300</b></label>
+                <label class="check-option"><input type="checkbox" name="toppers" value="Butterfly ($100 ea)">Butterfly <b>$100 ea</b></label>
+                <label class="check-option"><input type="checkbox" name="toppers" value="Bow ($100 ea)">Bow <b>$100 ea</b></label>
+                <label class="check-option"><input type="checkbox" name="toppers" value="Banner ($100 ea)">Banner <b>$100 ea</b></label>
+                <label class="check-option"><input type="checkbox" name="toppers" value="Crown ($500)">Crown <b>$500</b></label>
+                <label class="check-option"><input type="checkbox" name="toppers" value="Tiara ($1,000)">Tiara <b>$1,000</b></label>
+                <label class="check-option"><input type="checkbox" name="toppers" value="Baby's breath ($800)">Baby's breath <b>$800</b></label>
+                <label class="check-option"><input type="checkbox" name="toppers" value="Pearl Bows ($300 per)">Pearl Bows <b>$300 per</b></label>
+                <label class="check-option"><input type="checkbox" name="toppers" value="Mesh wrapping ($800)">Mesh wrapping <b>$800</b></label>
+                <label class="check-option"><input type="checkbox" name="toppers" value="Pins ($200)">Pins <b>$200</b></label>
+                <label class="check-option"><input type="checkbox" name="toppers" value="Other (quote)">Other <b>quote</b></label>
+              </div>
+            </fieldset>
+
+            <fieldset class="fieldset full" data-money-options hidden>
+              <legend>Money bouquet details</legend>
+              <p class="help-note">Select the Jamaican note denominations you would like included. The bouquet price will be quoted based on your selections.</p>
+              <div class="check-grid">
+                <label class="check-option"><input type="checkbox" name="cash_denominations" value="$5,000">$5,000 notes</label>
+                <label class="check-option"><input type="checkbox" name="cash_denominations" value="$2,000">$2,000 notes</label>
+                <label class="check-option"><input type="checkbox" name="cash_denominations" value="$1,000">$1,000 notes</label>
+                <label class="check-option"><input type="checkbox" name="cash_denominations" value="$500">$500 notes</label>
+                <label class="check-option"><input type="checkbox" name="cash_denominations" value="$100">$100 notes</label>
+                <label class="check-option"><input type="checkbox" name="cash_denominations" value="$50">$50 notes</label>
+              </div>
+              <label class="field" style="margin-top:12px"><span>Cash amount to include *</span><input type="text" name="cash_amount" inputmode="numeric" maxlength="30" data-cash-amount placeholder="For example, JMD 10,000"></label>
+            </fieldset>
+
+            <label class="field full"><span>Special instructions / design details</span><textarea name="details" maxlength="2000" data-order-details placeholder="Share colors, message, recipient, topper quantities, or special-request details."></textarea></label>
+            <label class="field full"><span>Inspiration photo (optional)</span><input type="file" name="inspiration" accept="image/*"></label>
+          </div>
+          <div class="submit-row">
+            <button type="submit" class="submit-button" data-submit-order disabled>Send order enquiry</button>
+            <p class="status" data-form-status role="status">Loading your cart...</p>
+            <p class="whatsapp">Prefer WhatsApp? <a href="https://wa.me/18765666651" target="_blank" rel="noopener">Message Forever Florals</a></p>
+          </div>
+        </section>
+      </div>
+    </form>
+  </main>
+  <script type="module" src="/src/order.js"></script>
+</body>
+</html>
