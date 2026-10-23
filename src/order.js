@@ -14,6 +14,8 @@ const form = document.getElementById('orderForm');
 const cartItems = document.querySelector('[data-cart-items]');
 const cartMessage = document.querySelector('[data-cart-message]');
 const cartSubtotal = document.querySelector('[data-cart-subtotal]');
+const cartTopperSubtotal = document.querySelector('[data-cart-topper-subtotal]');
+const cartTotal = document.querySelector('[data-cart-total]');
 const cartCount = document.querySelector('[data-cart-count]');
 const emptyCart = document.querySelector('[data-empty-cart]');
 const status = document.querySelector('[data-form-status]');
@@ -83,6 +85,17 @@ function getSubtotal() {
   }, 0);
 }
 
+function getSelectedToppers() {
+  return [...document.querySelectorAll('input[name="toppers"]:checked')].map((input) => ({
+    name: input.dataset.name || input.value,
+    price: input.dataset.price === undefined ? null : Number(input.dataset.price),
+  }));
+}
+
+function getTopperSubtotal() {
+  return getSelectedToppers().reduce((total, topper) => total + (topper.price ?? 0), 0);
+}
+
 function createCartItem(item) {
   const product = products[item.id];
   const article = document.createElement('article');
@@ -133,6 +146,24 @@ function createCartItem(item) {
   return article;
 }
 
+function createCartTopper(topper) {
+  const article = document.createElement('article');
+  article.className = 'cart-item cart-addon';
+
+  const title = document.createElement('div');
+  title.className = 'cart-item-title';
+  title.textContent = topper.name;
+
+  const price = document.createElement('div');
+  price.className = 'cart-item-price';
+  price.textContent = topper.price === null
+    ? 'Price confirmed by quote'
+    : `${formatPrice(topper.price)} (one selected)`;
+
+  article.append(title, price);
+  return article;
+}
+
 function updateOrderSummary() {
   if (!(form instanceof HTMLFormElement) || !orderSummary) return;
   const values = new FormData(form);
@@ -143,6 +174,8 @@ function updateOrderSummary() {
       unitPrice: products[id].price,
     })),
     bouquetSubtotal: getSubtotal(),
+    topperSubtotal: getTopperSubtotal(),
+    estimatedTotal: getSubtotal() + getTopperSubtotal(),
     wrap: values.get('wrap_color'),
     toppers: values.getAll('toppers'),
     delivery: values.get('delivery'),
@@ -180,7 +213,13 @@ function updateConditionalFields() {
 
 function renderCart() {
   if (!(cartItems instanceof HTMLElement)) return;
-  cartItems.replaceChildren(...cart.map(createCartItem));
+  cartItems.replaceChildren(
+    ...cart.map(createCartItem),
+    ...getSelectedToppers().map(createCartTopper),
+  );
+  const topperSubtotal = getTopperSubtotal();
+  if (cartTopperSubtotal) cartTopperSubtotal.textContent = formatPrice(topperSubtotal);
+  if (cartTotal) cartTotal.textContent = formatPrice(getSubtotal() + topperSubtotal);
   const count = cartQuantity();
   if (cartCount) cartCount.textContent = String(count);
   if (emptyCart) emptyCart.hidden = count > 0;
@@ -226,8 +265,6 @@ if (requestedProduct) {
   }
 }
 
-renderCart();
-
 try {
   const selectedToppers = JSON.parse(localStorage.getItem(topperKey) || '[]');
   if (!Array.isArray(selectedToppers)) throw new TypeError('Saved topper selections must be a list.');
@@ -238,6 +275,8 @@ try {
   console.error('Unable to load saved topper selections.', error);
   cartMessage.textContent = 'Saved topper selections could not be loaded. Please review them before sending your enquiry.';
 }
+
+renderCart();
 
 document.querySelector('[data-cart-items]')?.addEventListener('click', (event) => {
   const target = event.target;
@@ -271,7 +310,7 @@ document.querySelectorAll('input[name="toppers"]').forEach((input) => {
       console.error('Unable to save order topper selections.', error);
       cartMessage.textContent = 'Your topper selections could not be saved.';
     }
-    updateOrderSummary();
+    renderCart();
   });
 });
 

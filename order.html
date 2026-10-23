@@ -39,6 +39,7 @@
     .empty-cart p{margin:0 0 10px}
     .empty-cart a{color:var(--deep);font-weight:800;text-decoration:underline}
     .cart-item{display:grid;grid-template-columns:76px minmax(0,1fr);gap:12px;padding:10px;background:rgba(255,255,255,.78);border:2px solid #000}
+    .cart-addon{grid-template-columns:minmax(0,1fr)}
     .cart-item img{width:76px;height:76px;object-fit:cover;background:#f3a8c1}
     .cart-item-title{font-weight:800}
     .cart-item-price{font-size:.9rem;opacity:.82}
@@ -47,6 +48,7 @@
     .cart-controls button:hover,.cart-controls button:focus-visible{background:#6f35b5;color:#fff}
     .cart-controls .remove{width:auto;margin-left:auto;padding:0 8px;border-color:#000;color:#000;font-size:.75rem}
     .cart-summary{display:flex;justify-content:space-between;gap:10px;margin:18px 0 0;padding-top:14px;border-top:2px solid #000;font-weight:800}
+    .cart-summary.total{margin-top:8px;padding-top:10px;border-top:1px solid rgba(0,0,0,.4);font-size:1.05rem}
     .cart-note,.help-note{font-size:.82rem;opacity:.85}
     .cart-message{min-height:1.5em;color:var(--deep);font-size:.85rem;font-weight:700}
     .order-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
@@ -100,7 +102,9 @@
           <h2 id="cartHeading">Your cart</h2>
           <div class="cart-list" data-cart-items aria-live="polite"></div>
           <div class="cart-summary"><span>Bouquet subtotal</span><span data-cart-subtotal>$0</span></div>
-          <p class="cart-note">Subtotal includes priced bouquets only. Custom bouquets, add-ons, and delivery charges are confirmed with you before payment.</p>
+          <div class="cart-summary"><span>Selected toppers</span><span data-cart-topper-subtotal>$0</span></div>
+          <div class="cart-summary total"><span>Estimated total</span><span data-cart-total>$0</span></div>
+          <p class="cart-note">Estimate includes priced bouquets and selected priced toppers (one of each selected option). Quote-only items, extra topper quantities, and delivery are confirmed before payment.</p>
           <p class="cart-message" data-cart-message role="status"></p>
           <div class="empty-cart" data-empty-cart hidden><p>Your cart is empty.</p><a href="/#bouquets">Browse bouquets</a></div>
         </section>
@@ -120,17 +124,17 @@
             <fieldset class="fieldset full">
               <legend>Choose toppers and extras</legend>
               <div class="check-grid">
-                <label class="check-option"><input type="checkbox" name="toppers" value="Glitter ($300)">Glitter <b>$300</b></label>
-                <label class="check-option"><input type="checkbox" name="toppers" value="Butterfly ($100 ea)">Butterfly <b>$100 ea</b></label>
-                <label class="check-option"><input type="checkbox" name="toppers" value="Bow ($100 ea)">Bow <b>$100 ea</b></label>
-                <label class="check-option"><input type="checkbox" name="toppers" value="Banner ($100 ea)">Banner <b>$100 ea</b></label>
-                <label class="check-option"><input type="checkbox" name="toppers" value="Crown ($500)">Crown <b>$500</b></label>
-                <label class="check-option"><input type="checkbox" name="toppers" value="Tiara ($1,000)">Tiara <b>$1,000</b></label>
-                <label class="check-option"><input type="checkbox" name="toppers" value="Baby's breath ($800)">Baby's breath <b>$800</b></label>
-                <label class="check-option"><input type="checkbox" name="toppers" value="Pearl Bows ($300 per)">Pearl Bows <b>$300 per</b></label>
-                <label class="check-option"><input type="checkbox" name="toppers" value="Mesh wrapping ($800)">Mesh wrapping <b>$800</b></label>
-                <label class="check-option"><input type="checkbox" name="toppers" value="Pins ($200)">Pins <b>$200</b></label>
-                <label class="check-option"><input type="checkbox" name="toppers" value="Other (quote)">Other <b>quote</b></label>
+                <label class="check-option"><input type="checkbox" name="toppers" value="Glitter ($300)" data-name="Glitter" data-price="300">Glitter <b>$300</b></label>
+                <label class="check-option"><input type="checkbox" name="toppers" value="Butterfly ($100 ea)" data-name="Butterfly" data-price="100">Butterfly <b>$100 ea</b></label>
+                <label class="check-option"><input type="checkbox" name="toppers" value="Bow ($100 ea)" data-name="Bow" data-price="100">Bow <b>$100 ea</b></label>
+                <label class="check-option"><input type="checkbox" name="toppers" value="Banner ($100 ea)" data-name="Banner" data-price="100">Banner <b>$100 ea</b></label>
+                <label class="check-option"><input type="checkbox" name="toppers" value="Crown ($500)" data-name="Crown" data-price="500">Crown <b>$500</b></label>
+                <label class="check-option"><input type="checkbox" name="toppers" value="Tiara ($1,000)" data-name="Tiara" data-price="1000">Tiara <b>$1,000</b></label>
+                <label class="check-option"><input type="checkbox" name="toppers" value="Baby's breath ($800)" data-name="Baby's breath" data-price="800">Baby's breath <b>$800</b></label>
+                <label class="check-option"><input type="checkbox" name="toppers" value="Pearl Bows ($300 per)" data-name="Pearl Bows" data-price="300">Pearl Bows <b>$300 per</b></label>
+                <label class="check-option"><input type="checkbox" name="toppers" value="Mesh wrapping ($800)" data-name="Mesh wrapping" data-price="800">Mesh wrapping <b>$800</b></label>
+                <label class="check-option"><input type="checkbox" name="toppers" value="Pins ($200)" data-name="Pins" data-price="200">Pins <b>$200</b></label>
+                <label class="check-option"><input type="checkbox" name="toppers" value="Other (quote)" data-name="Other">Other <b>quote</b></label>
               </div>
             </fieldset>
 
