@@ -7,6 +7,7 @@ export default defineConfig({
       input: {
         main: resolve(process.cwd(), 'index.html'),
         order: resolve(process.cwd(), 'order.html'),
+        admin: resolve(process.cwd(), 'admin.html'),
       },
     },
   },

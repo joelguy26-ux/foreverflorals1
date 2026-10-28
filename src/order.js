@@ -10,6 +10,7 @@ const products = {
 
 const cartKey = 'foreverflorals.order.cart';
 const topperKey = 'foreverflorals.order.toppers';
+const topperQuantityKey = 'foreverflorals.order.topper-quantities';
 const form = document.getElementById('orderForm');
 const cartItems = document.querySelector('[data-cart-items]');
 const cartMessage = document.querySelector('[data-cart-message]');
@@ -28,10 +29,12 @@ const moneyOptions = document.querySelector('[data-money-options]');
 const cashAmount = document.querySelector('[data-cash-amount]');
 const orderDetails = document.querySelector('[data-order-details]');
 const dateNeeded = document.querySelector('[data-date-needed]');
-const orderFormId = import.meta.env.VITE_FORMSPREE_FORM_ID?.trim();
-const validFormId = Boolean(orderFormId && /^[a-zA-Z0-9]+$/.test(orderFormId));
+const inspirationInput = document.querySelector('[data-inspiration]');
+const inspirationName = document.querySelector('[data-inspiration-name]');
 let cart = [];
 let cartReady = false;
+let orderServiceReady = false;
+let isSubmitting = false;
 
 function setStatus(message, isError = false) {
   if (!status) return;
@@ -87,13 +90,30 @@ function getSubtotal() {
 
 function getSelectedToppers() {
   return [...document.querySelectorAll('input[name="toppers"]:checked')].map((input) => ({
+    value: input.value,
     name: input.dataset.name || input.value,
     price: input.dataset.price === undefined ? null : Number(input.dataset.price),
+    quantity: input.closest('.topper-choice')?.querySelector('[data-topper-quantity]')?.valueAsNumber || 1,
   }));
 }
 
 function getTopperSubtotal() {
-  return getSelectedToppers().reduce((total, topper) => total + (topper.price ?? 0), 0);
+  return getSelectedToppers().reduce((total, topper) => total + (topper.price ?? 0) * topper.quantity, 0);
+}
+
+function getExpandedToppers() {
+  return getSelectedToppers().flatMap(({ value, quantity }) => Array(quantity).fill(value));
+}
+
+function saveTopperSelections() {
+  const selected = [...document.querySelectorAll('input[name="toppers"]:checked')];
+  localStorage.setItem(topperKey, JSON.stringify(selected.map((option) => option.value)));
+  localStorage.setItem(topperQuantityKey, JSON.stringify(Object.fromEntries(
+    selected.flatMap((option) => {
+      const quantityInput = option.closest('.topper-choice')?.querySelector('[data-topper-quantity]');
+      return quantityInput ? [[option.value, quantityInput.valueAsNumber]] : [];
+    }),
+  )));
 }
 
 function createCartItem(item) {
@@ -158,7 +178,7 @@ function createCartTopper(topper) {
   price.className = 'cart-item-price';
   price.textContent = topper.price === null
     ? 'Price confirmed by quote'
-    : `${formatPrice(topper.price)} (one selected)`;
+    : `${topper.quantity} × ${formatPrice(topper.price)} = ${formatPrice(topper.price * topper.quantity)}`;
 
   article.append(title, price);
   return article;
@@ -177,7 +197,7 @@ function updateOrderSummary() {
     topperSubtotal: getTopperSubtotal(),
     estimatedTotal: getSubtotal() + getTopperSubtotal(),
     wrap: values.get('wrap_color'),
-    toppers: values.getAll('toppers'),
+    toppers: getSelectedToppers(),
     delivery: values.get('delivery'),
     deliveryDetails: values.get('delivery_details'),
     dateNeeded: values.get('date_needed'),
@@ -224,7 +244,7 @@ function renderCart() {
   if (cartCount) cartCount.textContent = String(count);
   if (emptyCart) emptyCart.hidden = count > 0;
   if (cartSubtotal) cartSubtotal.textContent = formatPrice(getSubtotal());
-  if (submitButton) submitButton.disabled = !validFormId || count === 0 || !cartReady;
+  if (submitButton) submitButton.disabled = !orderServiceReady || count === 0 || !cartReady || isSubmitting;
   updateConditionalFields();
   updateOrderSummary();
 }
@@ -268,8 +288,19 @@ if (requestedProduct) {
 try {
   const selectedToppers = JSON.parse(localStorage.getItem(topperKey) || '[]');
   if (!Array.isArray(selectedToppers)) throw new TypeError('Saved topper selections must be a list.');
+  const savedQuantities = JSON.parse(localStorage.getItem(topperQuantityKey) || '{}');
+  if (!savedQuantities || typeof savedQuantities !== 'object' || Array.isArray(savedQuantities)) {
+    throw new TypeError('Saved topper quantities must be an object.');
+  }
   document.querySelectorAll('input[name="toppers"]').forEach((input) => {
     input.checked = selectedToppers.includes(input.value);
+    const choice = input.closest('.topper-choice');
+    const quantityControl = choice?.querySelector('.topper-quantity');
+    const quantityInput = choice?.querySelector('[data-topper-quantity]');
+    if (quantityControl) quantityControl.hidden = !input.checked;
+    if (quantityInput && Number.isInteger(savedQuantities[input.value]) && savedQuantities[input.value] >= 1 && savedQuantities[input.value] <= 20) {
+      quantityInput.value = String(savedQuantities[input.value]);
+    }
   });
 } catch (error) {
   console.error('Unable to load saved topper selections.', error);
@@ -302,13 +333,35 @@ document.querySelector('[data-cart-items]')?.addEventListener('click', (event) =
 document.querySelectorAll('input[name="toppers"]').forEach((input) => {
   input.addEventListener('change', () => {
     try {
-      localStorage.setItem(
-        topperKey,
-        JSON.stringify([...document.querySelectorAll('input[name="toppers"]:checked')].map((option) => option.value)),
-      );
+      const choice = input.closest('.topper-choice');
+      const quantityControl = choice?.querySelector('.topper-quantity');
+      const quantityInput = choice?.querySelector('[data-topper-quantity]');
+      if (quantityControl) quantityControl.hidden = !input.checked;
+      if (!input.checked) quantityInput?.setCustomValidity('');
+      saveTopperSelections();
     } catch (error) {
       console.error('Unable to save order topper selections.', error);
       cartMessage.textContent = 'Your topper selections could not be saved.';
+    }
+    renderCart();
+  });
+});
+
+document.querySelectorAll('[data-topper-quantity]').forEach((input) => {
+  input.addEventListener('input', () => {
+    const quantity = input.valueAsNumber;
+    if (!Number.isInteger(quantity) || quantity < 1 || quantity > 20) {
+      input.setCustomValidity('Choose a quantity from 1 to 20.');
+      setStatus('Topper quantities must be between 1 and 20.', true);
+      return;
+    }
+    input.setCustomValidity('');
+    setStatus('');
+    try {
+      saveTopperSelections();
+    } catch (error) {
+      console.error('Unable to save topper quantities.', error);
+      cartMessage.textContent = 'Your topper quantities could not be saved.';
     }
     renderCart();
   });
@@ -338,6 +391,12 @@ form?.addEventListener('change', () => {
   updateOrderSummary();
 });
 
+inspirationInput?.addEventListener('change', () => {
+  if (inspirationInput instanceof HTMLInputElement && inspirationName) {
+    inspirationName.textContent = inspirationInput.files?.[0]?.name || 'No photo selected';
+  }
+});
+
 form?.addEventListener('animationend', (event) => {
   const field = event.target;
   if (event.animationName === 'field-glitch' && field instanceof HTMLElement) {
@@ -351,29 +410,126 @@ if (dateNeeded instanceof HTMLInputElement) {
   dateNeeded.min = localDate.toISOString().slice(0, 10);
 }
 
-if (validFormId && form instanceof HTMLFormElement) {
-  form.action = `https://formspree.io/f/${orderFormId}`;
-  setStatus('Your enquiry will be sent securely. We will confirm pricing and availability by email.');
-} else {
-  setStatus('Email ordering is not connected yet. Configure VITE_FORMSPREE_FORM_ID to enable email orders.', true);
+async function fileToBase64(file) {
+  if (file.size > 2 * 1024 * 1024) {
+    throw new Error('The inspiration photo must be 2 MB or smaller.');
+  }
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  let binary = '';
+  for (let offset = 0; offset < bytes.length; offset += 0x8000) {
+    binary += String.fromCharCode(...bytes.subarray(offset, offset + 0x8000));
+  }
+  return btoa(binary);
 }
 
-form?.addEventListener('submit', (event) => {
+async function checkOrderService() {
+  try {
+    const response = await fetch('/api/orders', { headers: { Accept: 'application/json' } });
+    if (!response.ok) throw new Error(`Order service check returned ${response.status}.`);
+    const result = await response.json();
+    orderServiceReady = result.ready === true;
+    setStatus(
+      orderServiceReady
+        ? 'Your order will be securely saved and sent to Forever Florals.'
+        : 'Online orders are being set up. Please contact us on WhatsApp for now.',
+      !orderServiceReady,
+    );
+  } catch (error) {
+    console.error('Unable to check order submission availability.', error);
+    setStatus('Online ordering is temporarily unavailable. Please contact us on WhatsApp.', true);
+  }
+  renderCart();
+}
+
+checkOrderService();
+
+form?.addEventListener('submit', async (event) => {
+  event.preventDefault();
   updateConditionalFields();
   updateOrderSummary();
+  if (isSubmitting) return;
   if (cartQuantity() === 0) {
-    event.preventDefault();
     setStatus('Add at least one bouquet to your cart before sending your enquiry.', true);
     return;
   }
-  if (!validFormId) {
-    event.preventDefault();
-    setStatus('Email ordering is not connected yet. Please use the WhatsApp link while email is being set up.', true);
+  if (!orderServiceReady) {
+    setStatus('Online ordering is not connected yet. Please use the WhatsApp link for now.', true);
     return;
   }
   if (!form.checkValidity()) {
-    event.preventDefault();
     form.reportValidity();
     setStatus('Please complete the required order details.', true);
+    return;
+  }
+
+  const values = new FormData(form);
+  const inspiration = values.get('inspiration');
+  try {
+    isSubmitting = true;
+    renderCart();
+    setStatus('Sending your order securely…');
+    const response = await fetch('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({
+        customer: {
+          name: values.get('name'),
+          email: values.get('email'),
+          phone: values.get('phone'),
+        },
+        cart,
+        dateNeeded: values.get('date_needed'),
+        occasion: values.get('occasion'),
+        wrapColor: values.get('wrap_color'),
+        toppers: getExpandedToppers(),
+        delivery: values.get('delivery'),
+        deliveryDetails: values.get('delivery_details'),
+        cashAmount: values.get('cash_amount'),
+        cashDenominations: values.getAll('cash_denominations'),
+        specialInstructions: values.get('details'),
+        inspiration: inspiration instanceof File && inspiration.size > 0
+          ? {
+              type: inspiration.type,
+              data: await fileToBase64(inspiration),
+            }
+          : null,
+      }),
+    });
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.error || 'We could not submit your order. Please try again.');
+    }
+    if (result.emailSent) {
+      setStatus('Your order was received. Forever Florals will follow up with you soon.');
+    } else {
+      setStatus('Your order was saved, but the shop notification could not be sent. Please also contact us on WhatsApp.', true);
+    }
+    cart = [];
+    saveCart();
+    renderCart();
+    form.reset();
+    document.querySelectorAll('input[name="toppers"]').forEach((input) => {
+      const choice = input.closest('.topper-choice');
+      const quantityControl = choice?.querySelector('.topper-quantity');
+      const quantityInput = choice?.querySelector('[data-topper-quantity]');
+      if (quantityControl) quantityControl.hidden = true;
+      if (quantityInput) {
+        quantityInput.value = '1';
+        quantityInput.setCustomValidity('');
+      }
+    });
+    if (inspirationName) inspirationName.textContent = 'No photo selected';
+    try {
+      localStorage.removeItem(topperKey);
+      localStorage.removeItem(topperQuantityKey);
+    } catch (error) {
+      console.error('Unable to clear saved order topper selections.', error);
+    }
+  } catch (error) {
+    console.error('Unable to submit Forever Florals order.', error);
+    setStatus(error instanceof Error ? error.message : 'We could not submit your order. Please try again.', true);
+  } finally {
+    isSubmitting = false;
+    renderCart();
   }
 });
