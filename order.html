@@ -71,9 +71,11 @@
     .check-option{display:flex;align-items:flex-start;gap:8px;padding:8px;background:rgba(255,255,255,.72);font-size:.78rem;font-weight:600}
     .check-option input{margin-top:3px;accent-color:#6f35b5}
     .check-option b{margin-left:auto;white-space:nowrap}
-    .topper-choice{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px;align-items:center}
-    .topper-quantity{display:flex;align-items:center;gap:4px;font-size:.7rem;font-weight:700}
-    .topper-quantity input{width:58px;min-height:34px;padding:4px;border:1px solid #000}
+    .add-product{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;margin-bottom:16px}
+    .add-product label{display:grid;gap:4px;font-size:.8rem;font-weight:700}
+    .add-product select{width:100%;min-height:40px;padding:6px;border:2px solid #000;background:#fff}
+    .add-product button{align-self:end;min-height:40px;padding:6px 12px;border:2px solid #000;background:#6f35b5;color:#fff;font-weight:700;cursor:pointer}
+    .add-product button:hover,.add-product button:focus-visible{background:#54258c}
     .submit-row{display:grid;justify-items:center;gap:10px;margin-top:8px}
     .submit-button{padding:12px 20px;border:3px solid #000;background:#4ade80;box-shadow:4px 4px 0 #000;color:#000;font-weight:800;cursor:pointer}
     .submit-button:hover:not(:disabled){transform:translate(2px,2px);box-shadow:2px 2px 0 #000}
@@ -110,6 +112,20 @@
       <div class="order-layout">
         <section class="panel" id="cart" aria-labelledby="cartHeading">
           <h2 id="cartHeading">Your cart</h2>
+          <div class="add-product">
+            <label for="addProductSelect">Add a bouquet
+              <select id="addProductSelect" data-add-product-select>
+                <option value="9-ct">9 ct bouquet</option>
+                <option value="15-ct">15 ct bouquet</option>
+                <option value="24-ct">24 ct bouquet</option>
+                <option value="36-ct">36 ct bouquet</option>
+                <option value="50-ct">50 ct bouquet</option>
+                <option value="money-bouquet">Money bouquet</option>
+                <option value="special-request">Special request bouquet</option>
+              </select>
+            </label>
+            <button type="button" data-add-product>Add</button>
+          </div>
           <div class="cart-list" data-cart-items aria-live="polite"></div>
           <div class="cart-summary"><span>Bouquet subtotal</span><span data-cart-subtotal>$0</span></div>
           <div class="cart-summary"><span>Selected toppers</span><span data-cart-topper-subtotal>$0</span></div>
@@ -134,16 +150,16 @@
             <fieldset class="fieldset full">
               <legend>Choose toppers and extras</legend>
               <div class="check-grid">
-                <div class="topper-choice"><label class="check-option"><input type="checkbox" name="toppers" value="Glitter ($300)" data-name="Glitter" data-price="300">Glitter <b>$300 each</b></label><span class="topper-quantity" hidden>Qty <input type="number" data-topper-quantity min="1" max="20" value="1" inputmode="numeric" aria-label="Glitter quantity"></span></div>
-                <div class="topper-choice"><label class="check-option"><input type="checkbox" name="toppers" value="Butterfly ($100 ea)" data-name="Butterfly" data-price="100">Butterfly <b>$100 ea</b></label><span class="topper-quantity" hidden>Qty <input type="number" data-topper-quantity min="1" max="20" value="1" inputmode="numeric" aria-label="Butterfly quantity"></span></div>
-                <div class="topper-choice"><label class="check-option"><input type="checkbox" name="toppers" value="Bow ($100 ea)" data-name="Bow" data-price="100">Bow <b>$100 ea</b></label><span class="topper-quantity" hidden>Qty <input type="number" data-topper-quantity min="1" max="20" value="1" inputmode="numeric" aria-label="Bow quantity"></span></div>
-                <div class="topper-choice"><label class="check-option"><input type="checkbox" name="toppers" value="Banner ($100 ea)" data-name="Banner" data-price="100">Banner <b>$100 ea</b></label><span class="topper-quantity" hidden>Qty <input type="number" data-topper-quantity min="1" max="20" value="1" inputmode="numeric" aria-label="Banner quantity"></span></div>
-                <div class="topper-choice"><label class="check-option"><input type="checkbox" name="toppers" value="Crown ($500)" data-name="Crown" data-price="500">Crown <b>$500 each</b></label><span class="topper-quantity" hidden>Qty <input type="number" data-topper-quantity min="1" max="20" value="1" inputmode="numeric" aria-label="Crown quantity"></span></div>
-                <div class="topper-choice"><label class="check-option"><input type="checkbox" name="toppers" value="Tiara ($1,000)" data-name="Tiara" data-price="1000">Tiara <b>$1,000 each</b></label><span class="topper-quantity" hidden>Qty <input type="number" data-topper-quantity min="1" max="20" value="1" inputmode="numeric" aria-label="Tiara quantity"></span></div>
-                <div class="topper-choice"><label class="check-option"><input type="checkbox" name="toppers" value="Baby's breath ($800)" data-name="Baby's breath" data-price="800">Baby's breath <b>$800 each</b></label><span class="topper-quantity" hidden>Qty <input type="number" data-topper-quantity min="1" max="20" value="1" inputmode="numeric" aria-label="Baby's breath quantity"></span></div>
-                <div class="topper-choice"><label class="check-option"><input type="checkbox" name="toppers" value="Pearl Bows ($300 per)" data-name="Pearl Bows" data-price="300">Pearl Bows <b>$300 per</b></label><span class="topper-quantity" hidden>Qty <input type="number" data-topper-quantity min="1" max="20" value="1" inputmode="numeric" aria-label="Pearl Bows quantity"></span></div>
-                <div class="topper-choice"><label class="check-option"><input type="checkbox" name="toppers" value="Mesh wrapping ($800)" data-name="Mesh wrapping" data-price="800">Mesh wrapping <b>$800 each</b></label><span class="topper-quantity" hidden>Qty <input type="number" data-topper-quantity min="1" max="20" value="1" inputmode="numeric" aria-label="Mesh wrapping quantity"></span></div>
-                <div class="topper-choice"><label class="check-option"><input type="checkbox" name="toppers" value="Pins ($200)" data-name="Pins" data-price="200">Pins <b>$200 each</b></label><span class="topper-quantity" hidden>Qty <input type="number" data-topper-quantity min="1" max="20" value="1" inputmode="numeric" aria-label="Pins quantity"></span></div>
+                <label class="check-option"><input type="checkbox" name="toppers" value="Glitter ($300)" data-name="Glitter" data-price="300">Glitter <b>$300 each</b></label>
+                <label class="check-option"><input type="checkbox" name="toppers" value="Butterfly ($100 ea)" data-name="Butterfly" data-price="100">Butterfly <b>$100 ea</b></label>
+                <label class="check-option"><input type="checkbox" name="toppers" value="Bow ($100 ea)" data-name="Bow" data-price="100">Bow <b>$100 ea</b></label>
+                <label class="check-option"><input type="checkbox" name="toppers" value="Banner ($100 ea)" data-name="Banner" data-price="100">Banner <b>$100 ea</b></label>
+                <label class="check-option"><input type="checkbox" name="toppers" value="Crown ($500)" data-name="Crown" data-price="500">Crown <b>$500 each</b></label>
+                <label class="check-option"><input type="checkbox" name="toppers" value="Tiara ($1,000)" data-name="Tiara" data-price="1000">Tiara <b>$1,000 each</b></label>
+                <label class="check-option"><input type="checkbox" name="toppers" value="Baby's breath ($800)" data-name="Baby's breath" data-price="800">Baby's breath <b>$800 each</b></label>
+                <label class="check-option"><input type="checkbox" name="toppers" value="Pearl Bows ($300 per)" data-name="Pearl Bows" data-price="300">Pearl Bows <b>$300 per</b></label>
+                <label class="check-option"><input type="checkbox" name="toppers" value="Mesh wrapping ($800)" data-name="Mesh wrapping" data-price="800">Mesh wrapping <b>$800 each</b></label>
+                <label class="check-option"><input type="checkbox" name="toppers" value="Pins ($200)" data-name="Pins" data-price="200">Pins <b>$200 each</b></label>
                 <label class="check-option"><input type="checkbox" name="toppers" value="Other (quote)" data-name="Other">Other <b>quote</b></label>
               </div>
             </fieldset>

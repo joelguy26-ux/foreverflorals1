@@ -32,6 +32,7 @@ const dateNeeded = document.querySelector('[data-date-needed]');
 const inspirationInput = document.querySelector('[data-inspiration]');
 const inspirationName = document.querySelector('[data-inspiration-name]');
 let cart = [];
+let topperQuantities = {};
 let cartReady = false;
 let orderServiceReady = false;
 let isSubmitting = false;
@@ -93,7 +94,7 @@ function getSelectedToppers() {
     value: input.value,
     name: input.dataset.name || input.value,
     price: input.dataset.price === undefined ? null : Number(input.dataset.price),
-    quantity: input.closest('.topper-choice')?.querySelector('[data-topper-quantity]')?.valueAsNumber || 1,
+    quantity: topperQuantities[input.value] || 1,
   }));
 }
 
@@ -108,12 +109,7 @@ function getExpandedToppers() {
 function saveTopperSelections() {
   const selected = [...document.querySelectorAll('input[name="toppers"]:checked')];
   localStorage.setItem(topperKey, JSON.stringify(selected.map((option) => option.value)));
-  localStorage.setItem(topperQuantityKey, JSON.stringify(Object.fromEntries(
-    selected.flatMap((option) => {
-      const quantityInput = option.closest('.topper-choice')?.querySelector('[data-topper-quantity]');
-      return quantityInput ? [[option.value, quantityInput.valueAsNumber]] : [];
-    }),
-  )));
+  localStorage.setItem(topperQuantityKey, JSON.stringify(topperQuantities));
 }
 
 function createCartItem(item) {
@@ -178,9 +174,38 @@ function createCartTopper(topper) {
   price.className = 'cart-item-price';
   price.textContent = topper.price === null
     ? 'Price confirmed by quote'
-    : `${topper.quantity} × ${formatPrice(topper.price)} = ${formatPrice(topper.price * topper.quantity)}`;
+    : `${formatPrice(topper.price)} each`;
 
-  article.append(title, price);
+  const controls = document.createElement('div');
+  controls.className = 'cart-controls';
+  if (topper.price !== null) {
+    const decrease = document.createElement('button');
+    decrease.type = 'button';
+    decrease.dataset.topperAction = 'decrease';
+    decrease.dataset.topperValue = topper.value;
+    decrease.setAttribute('aria-label', `Remove one ${topper.name}`);
+    decrease.textContent = '-';
+    const quantity = document.createElement('span');
+    quantity.textContent = String(topper.quantity);
+    quantity.setAttribute('aria-label', `${topper.name} quantity`);
+    const increase = document.createElement('button');
+    increase.type = 'button';
+    increase.dataset.topperAction = 'increase';
+    increase.dataset.topperValue = topper.value;
+    increase.disabled = topper.quantity >= 20;
+    increase.setAttribute('aria-label', `Add one ${topper.name}`);
+    increase.textContent = '+';
+    controls.append(decrease, quantity, increase);
+    price.textContent = `${formatPrice(topper.price)} each · ${formatPrice(topper.price * topper.quantity)} total`;
+  }
+  const remove = document.createElement('button');
+  remove.type = 'button';
+  remove.className = 'remove';
+  remove.dataset.topperAction = 'remove';
+  remove.dataset.topperValue = topper.value;
+  remove.textContent = 'Remove';
+  controls.append(remove);
+  article.append(title, price, controls);
   return article;
 }
 
@@ -264,6 +289,21 @@ function addProduct(id) {
   return true;
 }
 
+function updateTopperQuantity(value, action) {
+  const checkbox = [...document.querySelectorAll('input[name="toppers"]')].find((input) => input.value === value);
+  if (!checkbox) return;
+  const quantity = topperQuantities[value] || 1;
+  if (action === 'increase' && quantity < 20) {
+    topperQuantities[value] = quantity + 1;
+  } else if (action === 'decrease' && quantity > 1) {
+    topperQuantities[value] = quantity - 1;
+  } else if (action === 'decrease' || action === 'remove') {
+    checkbox.checked = false;
+    delete topperQuantities[value];
+  }
+  saveTopperSelections();
+}
+
 try {
   cart = loadCart();
   cartReady = true;
@@ -292,14 +332,12 @@ try {
   if (!savedQuantities || typeof savedQuantities !== 'object' || Array.isArray(savedQuantities)) {
     throw new TypeError('Saved topper quantities must be an object.');
   }
+  topperQuantities = {};
   document.querySelectorAll('input[name="toppers"]').forEach((input) => {
     input.checked = selectedToppers.includes(input.value);
-    const choice = input.closest('.topper-choice');
-    const quantityControl = choice?.querySelector('.topper-quantity');
-    const quantityInput = choice?.querySelector('[data-topper-quantity]');
-    if (quantityControl) quantityControl.hidden = !input.checked;
-    if (quantityInput && Number.isInteger(savedQuantities[input.value]) && savedQuantities[input.value] >= 1 && savedQuantities[input.value] <= 20) {
-      quantityInput.value = String(savedQuantities[input.value]);
+    const quantity = savedQuantities[input.value];
+    if (input.checked) {
+      topperQuantities[input.value] = Number.isInteger(quantity) && quantity >= 1 && quantity <= 20 ? quantity : 1;
     }
   });
 } catch (error) {
@@ -312,6 +350,17 @@ renderCart();
 document.querySelector('[data-cart-items]')?.addEventListener('click', (event) => {
   const target = event.target;
   if (!(target instanceof HTMLButtonElement)) return;
+  if (target.dataset.topperAction) {
+    try {
+      updateTopperQuantity(target.dataset.topperValue, target.dataset.topperAction);
+      cartMessage.textContent = '';
+      renderCart();
+    } catch (error) {
+      console.error('Unable to update topper quantities.', error);
+      cartMessage.textContent = 'Your topper selection could not be updated.';
+    }
+    return;
+  }
   const item = cart.find((entry) => entry.id === target.dataset.productId);
   if (!item) return;
   if (target.dataset.cartAction === 'increase' && item.quantity < 20) {
@@ -333,11 +382,11 @@ document.querySelector('[data-cart-items]')?.addEventListener('click', (event) =
 document.querySelectorAll('input[name="toppers"]').forEach((input) => {
   input.addEventListener('change', () => {
     try {
-      const choice = input.closest('.topper-choice');
-      const quantityControl = choice?.querySelector('.topper-quantity');
-      const quantityInput = choice?.querySelector('[data-topper-quantity]');
-      if (quantityControl) quantityControl.hidden = !input.checked;
-      if (!input.checked) quantityInput?.setCustomValidity('');
+      if (input.checked) {
+        topperQuantities[input.value] = topperQuantities[input.value] || 1;
+      } else {
+        delete topperQuantities[input.value];
+      }
       saveTopperSelections();
     } catch (error) {
       console.error('Unable to save order topper selections.', error);
@@ -347,24 +396,16 @@ document.querySelectorAll('input[name="toppers"]').forEach((input) => {
   });
 });
 
-document.querySelectorAll('[data-topper-quantity]').forEach((input) => {
-  input.addEventListener('input', () => {
-    const quantity = input.valueAsNumber;
-    if (!Number.isInteger(quantity) || quantity < 1 || quantity > 20) {
-      input.setCustomValidity('Choose a quantity from 1 to 20.');
-      setStatus('Topper quantities must be between 1 and 20.', true);
-      return;
-    }
-    input.setCustomValidity('');
-    setStatus('');
-    try {
-      saveTopperSelections();
-    } catch (error) {
-      console.error('Unable to save topper quantities.', error);
-      cartMessage.textContent = 'Your topper quantities could not be saved.';
-    }
+document.querySelector('[data-add-product]')?.addEventListener('click', () => {
+  const selector = document.querySelector('[data-add-product-select]');
+  if (!(selector instanceof HTMLSelectElement) || !products[selector.value]) {
+    cartMessage.textContent = 'Choose a valid bouquet to add.';
+    return;
+  }
+  if (addProduct(selector.value)) {
+    cartMessage.textContent = `${products[selector.value].name} added to your cart.`;
     renderCart();
-  });
+  }
 });
 
 form?.addEventListener('input', (event) => {
@@ -509,15 +550,9 @@ form?.addEventListener('submit', async (event) => {
     renderCart();
     form.reset();
     document.querySelectorAll('input[name="toppers"]').forEach((input) => {
-      const choice = input.closest('.topper-choice');
-      const quantityControl = choice?.querySelector('.topper-quantity');
-      const quantityInput = choice?.querySelector('[data-topper-quantity]');
-      if (quantityControl) quantityControl.hidden = true;
-      if (quantityInput) {
-        quantityInput.value = '1';
-        quantityInput.setCustomValidity('');
-      }
+      input.checked = false;
     });
+    topperQuantities = {};
     if (inspirationName) inspirationName.textContent = 'No photo selected';
     try {
       localStorage.removeItem(topperKey);
