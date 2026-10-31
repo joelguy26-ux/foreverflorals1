@@ -72,8 +72,9 @@ included only in invoice emails.
    as a Vercel environment variable for the dashboard build. The anon key is
    public by design; the service-role key must remain
    server-only.
-8. Redeploy the latest commit. The order page checks the server endpoint and
-   enables submission only when all required settings are present.
+8. Redeploy the latest commit. The order page checks the server endpoint,
+   retries transient check failures, and enables submission only when all
+   required settings are present.
 9. Open `/admin.html`, sign in with the admin account, and verify inquiries
    appear. Confirm a test order with a final JMD total to send its invoice, then
    mark it paid to check the dashboard's lifetime count and revenue.

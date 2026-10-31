@@ -465,8 +465,19 @@ async function fileToBase64(file) {
 
 async function checkOrderService() {
   try {
-    const response = await fetch('/api/orders', { headers: { Accept: 'application/json' } });
-    if (!response.ok) throw new Error(`Order service check returned ${response.status}.`);
+    let response;
+    let lastError;
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      try {
+        response = await fetch('/api/orders', { headers: { Accept: 'application/json' } });
+        if (response.ok) break;
+        lastError = new Error(`Order service check returned ${response.status}.`);
+      } catch (error) {
+        lastError = error;
+      }
+      if (attempt < 2) await new Promise((resolve) => setTimeout(resolve, 500 * (attempt + 1)));
+    }
+    if (!response?.ok) throw lastError || new Error('Order service check failed.');
     const result = await response.json();
     orderServiceReady = result.ready === true;
     setStatus(
