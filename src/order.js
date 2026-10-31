@@ -21,6 +21,7 @@ const cartCount = document.querySelector('[data-cart-count]');
 const emptyCart = document.querySelector('[data-empty-cart]');
 const status = document.querySelector('[data-form-status]');
 const submitButton = document.querySelector('[data-submit-order]');
+const retryOrderServiceButton = document.querySelector('[data-retry-order-service]');
 const orderSummary = document.querySelector('[data-order-summary]');
 const deliverySelect = document.querySelector('[data-delivery]');
 const deliveryDetails = document.querySelector('[data-delivery-details]');
@@ -464,12 +465,19 @@ async function fileToBase64(file) {
 }
 
 async function checkOrderService() {
+  if (retryOrderServiceButton) {
+    retryOrderServiceButton.disabled = true;
+    retryOrderServiceButton.textContent = 'Checking connection...';
+  }
   try {
     let response;
     let lastError;
     for (let attempt = 0; attempt < 3; attempt += 1) {
       try {
-        response = await fetch('/api/orders', { headers: { Accept: 'application/json' } });
+        response = await fetch(`/api/orders?check=${Date.now()}`, {
+          headers: { Accept: 'application/json' },
+          cache: 'no-store',
+        });
         if (response.ok) break;
         lastError = new Error(`Order service check returned ${response.status}.`);
       } catch (error) {
@@ -480,6 +488,7 @@ async function checkOrderService() {
     if (!response?.ok) throw lastError || new Error('Order service check failed.');
     const result = await response.json();
     orderServiceReady = result.ready === true;
+    if (retryOrderServiceButton) retryOrderServiceButton.hidden = true;
     setStatus(
       orderServiceReady
         ? 'Your order will be securely saved and sent to Forever Florals.'
@@ -489,11 +498,18 @@ async function checkOrderService() {
   } catch (error) {
     console.error('Unable to check order submission availability.', error);
     setStatus('Online ordering is temporarily unavailable. Please contact us on WhatsApp.', true);
+    if (retryOrderServiceButton) retryOrderServiceButton.hidden = false;
+  } finally {
+    if (retryOrderServiceButton) {
+      retryOrderServiceButton.disabled = false;
+      retryOrderServiceButton.textContent = 'Check connection again';
+    }
   }
   renderCart();
 }
 
 checkOrderService();
+retryOrderServiceButton?.addEventListener('click', () => void checkOrderService());
 
 form?.addEventListener('submit', async (event) => {
   event.preventDefault();
