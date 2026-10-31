@@ -35,7 +35,6 @@ const inspirationName = document.querySelector('[data-inspiration-name]');
 let cart = [];
 let topperQuantities = {};
 let cartReady = false;
-let orderServiceReady = false;
 let isSubmitting = false;
 
 function setStatus(message, isError = false) {
@@ -270,7 +269,7 @@ function renderCart() {
   if (cartCount) cartCount.textContent = String(count);
   if (emptyCart) emptyCart.hidden = count > 0;
   if (cartSubtotal) cartSubtotal.textContent = formatPrice(getSubtotal());
-  if (submitButton) submitButton.disabled = !orderServiceReady || count === 0 || !cartReady || isSubmitting;
+  if (submitButton) submitButton.disabled = count === 0 || !cartReady || isSubmitting;
   updateConditionalFields();
   updateOrderSummary();
 }
@@ -487,17 +486,16 @@ async function checkOrderService() {
     }
     if (!response?.ok) throw lastError || new Error('Order service check failed.');
     const result = await response.json();
-    orderServiceReady = result.ready === true;
     if (retryOrderServiceButton) retryOrderServiceButton.hidden = true;
     setStatus(
-      orderServiceReady
+      result.ready === true
         ? 'Your order will be securely saved and sent to Forever Florals.'
-        : 'Online orders are being set up. Please contact us on WhatsApp for now.',
-      !orderServiceReady,
+        : 'Online order setup is incomplete. You can try sending your enquiry, and the server will confirm availability.',
+      result.ready !== true,
     );
   } catch (error) {
     console.error('Unable to check order submission availability.', error);
-    setStatus('Online ordering is temporarily unavailable. Please contact us on WhatsApp.', true);
+    setStatus('We could not verify ordering just now. You can still send your enquiry; the server will confirm availability.', true);
     if (retryOrderServiceButton) retryOrderServiceButton.hidden = false;
   } finally {
     if (retryOrderServiceButton) {
@@ -518,10 +516,6 @@ form?.addEventListener('submit', async (event) => {
   if (isSubmitting) return;
   if (cartQuantity() === 0) {
     setStatus('Add at least one bouquet to your cart before sending your enquiry.', true);
-    return;
-  }
-  if (!orderServiceReady) {
-    setStatus('Online ordering is not connected yet. Please use the WhatsApp link for now.', true);
     return;
   }
   if (!form.checkValidity()) {
