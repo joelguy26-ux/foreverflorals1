@@ -22,6 +22,10 @@ const emptyCart = document.querySelector('[data-empty-cart]');
 const status = document.querySelector('[data-form-status]');
 const submitButton = document.querySelector('[data-submit-order]');
 const retryOrderServiceButton = document.querySelector('[data-retry-order-service]');
+const orderConfirmation = document.querySelector('[data-order-confirmation]');
+const orderConfirmationMessage = document.querySelector('[data-order-confirmation-message]');
+const confirmationWhatsapp = document.querySelector('[data-confirmation-whatsapp]');
+const closeConfirmationButton = document.querySelector('[data-close-confirmation]');
 const orderSummary = document.querySelector('[data-order-summary]');
 const deliverySelect = document.querySelector('[data-delivery]');
 const deliveryDetails = document.querySelector('[data-delivery-details]');
@@ -508,6 +512,7 @@ async function checkOrderService() {
 
 checkOrderService();
 retryOrderServiceButton?.addEventListener('click', () => void checkOrderService());
+closeConfirmationButton?.addEventListener('click', () => orderConfirmation?.close());
 
 form?.addEventListener('submit', async (event) => {
   event.preventDefault();
@@ -563,9 +568,19 @@ form?.addEventListener('submit', async (event) => {
     }
     if (result.emailSent) {
       setStatus('Your order was received. Forever Florals will follow up with you soon.');
+      if (orderConfirmationMessage) {
+        orderConfirmationMessage.textContent = 'Your order was received. Forever Florals will follow up with you soon.';
+      }
+      if (confirmationWhatsapp) confirmationWhatsapp.hidden = true;
     } else {
       setStatus('Your order was saved, but the shop notification could not be sent. Please also contact us on WhatsApp.', true);
+      if (orderConfirmationMessage) {
+        orderConfirmationMessage.textContent = 'Your order was saved, but the shop notification could not be sent. Please message us on WhatsApp so we can follow up.';
+      }
+      if (confirmationWhatsapp) confirmationWhatsapp.hidden = false;
     }
+    orderConfirmation?.showModal();
+    closeConfirmationButton?.focus();
     cart = [];
     saveCart();
     renderCart();

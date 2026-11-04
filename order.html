@@ -82,9 +82,21 @@
     .submit-button:disabled{cursor:not-allowed;opacity:.6}
     .status{min-height:1.5em;margin:0;text-align:center;color:var(--deep);font-size:.82rem}
     .form-error{color:#7b092f}
+    .order-confirmation{width:min(520px,calc(100% - 32px));max-width:none;padding:0;border:3px solid #000;background:#fff3f6;color:var(--ink);box-shadow:10px 10px 0 #000;text-align:center}
+    .order-confirmation[open]{animation:confirmation-pop .45s cubic-bezier(.2,.8,.2,1) both}
+    .order-confirmation::backdrop{background:rgba(44,15,30,.68);animation:confirmation-fade .25s ease-out both}
+    .order-confirmation-content{display:grid;justify-items:center;gap:12px;padding:clamp(24px,6vw,42px)}
+    .order-confirmation-icon{display:grid;place-items:center;width:64px;height:64px;border:3px solid #000;border-radius:50%;background:#4ade80;color:#000;font-size:2rem;font-weight:800}
+    .order-confirmation h2{margin:0;color:var(--deep);font-size:clamp(1.8rem,6vw,2.4rem)}
+    .order-confirmation p{margin:0}
+    .order-confirmation-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:8px}
+    .order-confirmation-actions a,.order-confirmation-actions button{min-height:46px;padding:10px 16px;border:2px solid #000;background:#fff;color:var(--ink);font-weight:800;cursor:pointer}
+    .order-confirmation-actions a{background:#4ade80}
     .whatsapp{font-size:.82rem}
     .whatsapp a{text-decoration:underline;font-weight:800}
     .field.is-shaking{animation:field-glitch .3s cubic-bezier(.25,.8,.25,1) 1}
+    @keyframes confirmation-pop{from{opacity:0;transform:translateY(24px) scale(.92)}to{opacity:1;transform:translateY(0) scale(1)}}
+    @keyframes confirmation-fade{from{opacity:0}to{opacity:1}}
     @keyframes field-glitch{0%,100%{transform:translate(0)}20%{transform:translate(-2px,2px)}40%{transform:translate(-2px,-2px)}60%{transform:translate(2px,2px)}80%{transform:translate(2px,-2px)}}
     [hidden]{display:none!important}
     @media(max-width:800px){.order-layout{grid-template-columns:1fr}.panel{padding:24px}}
@@ -191,6 +203,17 @@
       </div>
     </form>
   </main>
+  <dialog class="order-confirmation" data-order-confirmation aria-labelledby="order-confirmation-title" aria-describedby="order-confirmation-message">
+    <div class="order-confirmation-content">
+      <span class="order-confirmation-icon" aria-hidden="true">✓</span>
+      <h2 id="order-confirmation-title">Your order was received!</h2>
+      <p data-order-confirmation-message>Your order was received. Forever Florals will follow up with you soon.</p>
+      <div class="order-confirmation-actions">
+        <a href="https://wa.me/18765666651" target="_blank" rel="noopener" data-confirmation-whatsapp hidden>Message us on WhatsApp</a>
+        <button type="button" data-close-confirmation>Continue browsing</button>
+      </div>
+    </div>
+  </dialog>
   <script type="module" src="/src/order.js"></script>
 </body>
 </html>
