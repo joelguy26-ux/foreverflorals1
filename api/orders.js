@@ -175,6 +175,10 @@ function orderEmail(payload, orderId, imageUrl) {
   payload.toppers.forEach((item) => topperCounts.set(item, (topperCounts.get(item) || 0) + 1));
   const topperLines = [...topperCounts].map(([item, quantity]) => `- ${quantity} x ${item}`);
   const lines = [
+    'A new order inquiry has been received.',
+    'Please review and confirm this order in the admin dashboard:',
+    'https://www.foreverflorals.store/admin.html',
+    '',
     `Order reference: ${orderId}`,
     `Customer: ${payload.customer.name}`,
     `Email: ${payload.customer.email}`,
@@ -291,7 +295,7 @@ export default async function handler(req, res) {
         from: process.env.ORDER_FROM_EMAIL,
         to: [process.env.ORDER_NOTIFICATION_EMAIL],
         replyTo: payload.customer.email.trim(),
-        subject: `New Forever Florals order (${orderId.slice(0, 8)})`,
+        subject: `Action needed: Review new Forever Florals order (${orderId.slice(0, 8)})`,
         text: orderEmail(payload, orderId, inspirationUrl),
       });
       if (error) throw new Error(error.message);

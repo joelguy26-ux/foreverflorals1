@@ -60,7 +60,8 @@ included only in invoice emails.
    email/password sign-in for the dashboard.
 6. In Vercel, open the project **Settings → Environment Variables** and add
    `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `ORDER_RATE_LIMIT_SECRET`,
-   `RESEND_API_KEY`, `ORDER_NOTIFICATION_EMAIL`, `ORDER_FROM_EMAIL`, and
+   `RESEND_API_KEY`, `ORDER_NOTIFICATION_EMAIL` (`Foreverflorals.ltd@gmail.com`),
+   `ORDER_FROM_EMAIL`, and
    `ORDER_ADMIN_EMAILS` (`joelguy26@gmail.com,Foreverflorals.ltd@gmail.com`)
    for Production (and Preview if desired). Add the bank
    transfer details as `PAYMENT_BANK_NAME`, `PAYMENT_ACCOUNT_NAME`, and
