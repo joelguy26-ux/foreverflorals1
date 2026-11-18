@@ -3,6 +3,10 @@ import { createClient } from '@supabase/supabase-js';
 const loginPanel = document.querySelector('[data-login-panel]');
 const loginForm = document.querySelector('[data-login-form]');
 const loginStatus = document.querySelector('[data-login-status]');
+const previewLink = document.querySelector('[data-preview-link]');
+const previewNotice = document.querySelector('[data-preview-notice]');
+const settingsForm = document.querySelector('[data-settings-form]');
+const settingsStatus = document.querySelector('[data-settings-status]');
 const dashboard = document.querySelector('[data-dashboard]');
 const dashboardStatus = document.querySelector('[data-dashboard-status]');
 const orderList = document.querySelector('[data-order-list]');
@@ -18,6 +22,7 @@ const adminEmails = new Set(
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL?.trim();
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY?.trim();
 const supabase = supabaseUrl && supabaseAnonKey ? createClient(supabaseUrl, supabaseAnonKey) : null;
+const previewMode = import.meta.env.DEV;
 let session = null;
 
 function setMessage(element, message, isError = false) {
@@ -71,6 +76,15 @@ function createOrderCard(order) {
   );
   const badge = createTextElement('span', `badge ${order.order_status}`, order.order_status);
   top.append(heading, badge);
+  const notificationStatus = createTextElement(
+    'p',
+    'order-meta',
+    `Shop email: ${(order.notification_status || 'unknown').replaceAll('_', ' ')} · Customer email: ${(order.customer_notification_status || 'unknown').replaceAll('_', ' ')}`,
+  );
+  notificationStatus.classList.toggle(
+    'error',
+    order.notification_status === 'failed' || order.customer_notification_status === 'failed',
+  );
 
   const columns = document.createElement('div');
   columns.className = 'order-columns';
@@ -78,7 +92,33 @@ function createOrderCard(order) {
   const details = createTextElement('p', 'order-details',
     `${bouquetDescription(order)}\nToppers: ${topperDescription(order.toppers)}\nWrap: ${order.wrap_color}\nDelivery: ${order.delivery}${order.delivery_details ? `\nDetails: ${order.delivery_details}` : ''}\nDate needed: ${order.date_needed}\nOccasion: ${order.occasion || 'Not specified'}${order.cash_amount ? `\nMoney bouquet cash: ${order.cash_amount}` : ''}${order.cash_denominations?.length ? `\nCash denominations: ${order.cash_denominations.join(', ')}` : ''}${order.special_instructions ? `\nInstructions: ${order.special_instructions}` : ''}`);
   columns.append(contact, details);
-  card.append(top, columns);
+  card.append(top, notificationStatus, columns);
+
+  const notes = document.createElement('div');
+  notes.className = 'order-notes';
+  const notesLabel = document.createElement('label');
+  const noteLocked = Boolean(order.invoice_sent_at);
+  notesLabel.textContent = 'Message for customer (included in invoice)';
+  const notesInput = document.createElement('textarea');
+  notesInput.maxLength = 2000;
+  notesInput.value = order.customer_note || '';
+  notesInput.readOnly = noteLocked;
+  notesInput.setAttribute('aria-label', `Message for customer for order ${order.id.slice(0, 8)}`);
+  notes.append(notesLabel, notesInput);
+  if (noteLocked) {
+    notes.append(createTextElement('p', 'order-meta', 'Locked because the first invoice has been sent.'));
+  } else {
+    const saveNote = document.createElement('button');
+    saveNote.type = 'button';
+    saveNote.className = 'secondary';
+    saveNote.textContent = 'Save customer message';
+    saveNote.addEventListener('click', () => updateOrder(order.id, {
+      action: 'save_customer_note',
+      note: notesInput.value,
+    }));
+    notes.append(saveNote, createTextElement('p', 'order-meta', 'Save before sending the invoice. This message will be locked after the invoice is sent.'));
+  }
+  card.append(notes);
 
   if (order.order_status === 'inquiry') {
     const controls = document.createElement('div');
@@ -138,6 +178,9 @@ function createOrderCard(order) {
   } else {
     card.append(createTextElement('p', 'order-meta', 'This inquiry was cancelled.'));
   }
+  if (previewMode) {
+    card.querySelectorAll('button, input, textarea').forEach((control) => { control.disabled = true; });
+  }
   return card;
 }
 
@@ -161,6 +204,78 @@ async function apiRequest(path, options = {}) {
 }
 
 async function loadOrders() {
+  if (previewMode) {
+    const orders = [
+      {
+        id: 'a1b2c3d4-1111-4111-8111-111111111111',
+        created_at: '2026-11-15T14:30:00.000Z',
+        customer_name: 'Sample Customer',
+        customer_email: 'customer@example.com',
+        customer_phone: '876-555-0100',
+        date_needed: '2026-12-10',
+        occasion: 'Birthday',
+        wrap_color: 'Pink',
+        delivery: "St. Ann's Bay, face-to-face ($500)",
+        delivery_details: 'Sample delivery details',
+        bouquet_items: [{ name: '24 ct bouquet', quantity: 1, unitPrice: 8500 }],
+        toppers: ['Bow ($100 ea)'],
+        cash_denominations: [],
+        estimated_total_jmd: 8600,
+        order_status: 'inquiry',
+        notification_status: 'sent',
+        customer_notification_status: 'sent',
+        customer_note: 'Please call before delivery.',
+      },
+      {
+        id: 'a1b2c3d4-2222-4222-8222-222222222222',
+        created_at: '2026-11-14T10:15:00.000Z',
+        customer_name: 'Example Client',
+        customer_email: 'client@example.com',
+        customer_phone: '876-555-0101',
+        date_needed: '2026-12-05',
+        occasion: 'Anniversary',
+        wrap_color: 'White',
+        delivery: 'Pickup',
+        delivery_details: null,
+        bouquet_items: [{ name: '36 ct bouquet', quantity: 1, unitPrice: 10000 }],
+        toppers: ['Glitter ($300)'],
+        cash_denominations: [],
+        order_status: 'confirmed',
+        confirmed_total_jmd: 12500,
+        invoice_sent_at: '2026-11-14T11:00:00.000Z',
+        notification_status: 'sent',
+        customer_notification_status: 'sent',
+        customer_note: 'Happy anniversary! We hope you enjoy your bouquet.',
+      },
+      {
+        id: 'a1b2c3d4-3333-4333-8333-333333333333',
+        created_at: '2026-11-12T09:00:00.000Z',
+        customer_name: 'Demo Buyer',
+        customer_email: 'buyer@example.com',
+        customer_phone: '876-555-0102',
+        date_needed: '2026-11-20',
+        occasion: 'Graduation',
+        wrap_color: 'Black',
+        delivery: 'Pickup',
+        delivery_details: null,
+        bouquet_items: [{ name: '50 ct bouquet', quantity: 1, unitPrice: 15000 }],
+        toppers: [],
+        cash_denominations: [],
+        order_status: 'paid',
+        confirmed_total_jmd: 15000,
+        paid_at: '2026-11-13T12:00:00.000Z',
+        notification_status: 'failed',
+        customer_notification_status: 'sent',
+        customer_note: '',
+      },
+    ];
+    if (lifetimeCount) lifetimeCount.textContent = '2';
+    if (lifetimeRevenue) lifetimeRevenue.textContent = formatJmd(27500);
+    orderList?.replaceChildren(...orders.map(createOrderCard));
+    setMessage(dashboardStatus, `${orders.length} sample inquiries or orders loaded.`);
+    return;
+  }
+
   setMessage(dashboardStatus, 'Loading orders…');
   try {
     const result = await apiRequest('/api/admin/orders');
@@ -178,10 +293,52 @@ async function loadOrders() {
   }
 }
 
+async function loadPaymentSettings() {
+  if (previewMode) return;
+  if (!(settingsForm instanceof HTMLFormElement)) return;
+
+  try {
+    const { settings } = await apiRequest('/api/admin/settings');
+    for (const [field, value] of Object.entries(settings)) {
+      const input = settingsForm.elements.namedItem(field);
+      if (input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) {
+        input.value = value || '';
+      }
+    }
+    setMessage(settingsStatus, 'Payment details loaded.');
+  } catch (error) {
+    setMessage(settingsStatus, error instanceof Error ? error.message : 'Payment details could not be loaded.', true);
+  }
+}
+
+async function savePaymentSettings(event) {
+  event.preventDefault();
+  if (previewMode || !(settingsForm instanceof HTMLFormElement)) return;
+
+  const values = Object.fromEntries(new FormData(settingsForm));
+  const button = settingsForm.querySelector('button[type="submit"]');
+  if (button instanceof HTMLButtonElement) button.disabled = true;
+  setMessage(settingsStatus, 'Saving payment details…');
+  try {
+    await apiRequest('/api/admin/settings', {
+      method: 'POST',
+      body: JSON.stringify(values),
+    });
+    setMessage(settingsStatus, 'Payment details saved. They will be used in new and resent invoices.');
+  } catch (error) {
+    setMessage(settingsStatus, error instanceof Error ? error.message : 'Payment details could not be saved.', true);
+  } finally {
+    if (button instanceof HTMLButtonElement) button.disabled = false;
+  }
+}
+
 async function updateOrder(orderId, action) {
+  if (previewMode) return;
   const buttons = orderList?.querySelectorAll('button');
   buttons?.forEach((button) => { button.disabled = true; });
-  setMessage(dashboardStatus, action.action === 'confirm' ? 'Confirming order and sending invoice…' : 'Updating order…');
+  setMessage(dashboardStatus, action.action === 'confirm'
+    ? 'Confirming order and sending invoice…'
+    : action.action === 'save_notes' ? 'Saving internal notes…' : 'Updating order…');
   try {
     await apiRequest(`/api/admin/orders/${encodeURIComponent(orderId)}`, {
       method: 'POST',
@@ -198,36 +355,35 @@ async function updateOrder(orderId, action) {
 
 async function signIn(event) {
   event.preventDefault();
+  if (previewMode) return;
   if (!supabase || adminEmails.size === 0) {
     setMessage(loginStatus, 'Admin sign-in is not configured. Set the public Supabase URL, anon key, and allowed admin email build variable.', true);
     return;
   }
   const values = new FormData(loginForm);
   const email = String(values.get('email') || '').trim().toLowerCase();
-  const password = String(values.get('password') || '');
   if (!adminEmails.has(email)) {
     setMessage(loginStatus, 'This email is not allowed to access the admin dashboard.', true);
     return;
   }
-  setMessage(loginStatus, 'Signing in…');
-  let data;
-  let error;
+  setMessage(loginStatus, 'Sending your secure sign-in link…');
   try {
-    ({ data, error } = await supabase.auth.signInWithPassword({ email, password }));
-  } catch (requestError) {
-    setMessage(loginStatus, requestError instanceof Error ? requestError.message : 'Sign in could not be completed.', true);
-    return;
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/admin.html`,
+        shouldCreateUser: false,
+      },
+    });
+    if (error) throw error;
+    setMessage(loginStatus, 'If this admin account exists, a secure sign-in link has been sent. Check your inbox and spam folder, then open the link on this device.');
+  } catch (error) {
+    setMessage(loginStatus, error instanceof Error ? error.message : 'The sign-in email could not be sent.', true);
   }
-  if (error) {
-    setMessage(loginStatus, error.message, true);
-    return;
-  }
-  session = data.session;
-  showDashboard(true);
-  await loadOrders();
 }
 
 if (loginForm instanceof HTMLFormElement) loginForm.addEventListener('submit', (event) => void signIn(event));
+if (settingsForm instanceof HTMLFormElement) settingsForm.addEventListener('submit', (event) => void savePaymentSettings(event));
 if (signOutButton) {
   signOutButton.addEventListener('click', async () => {
     if (supabase) {
@@ -243,8 +399,21 @@ if (signOutButton) {
   });
 }
 document.querySelector('[data-refresh]')?.addEventListener('click', () => void loadOrders());
+if (import.meta.env.DEV && previewLink) previewLink.hidden = false;
+window.setInterval(() => {
+  if (session) void loadOrders();
+}, 60_000);
 
-if (!supabase || adminEmails.size === 0) {
+if (previewMode) {
+  showDashboard(true);
+  if (signOutButton) signOutButton.hidden = true;
+  if (previewNotice) previewNotice.hidden = false;
+  if (settingsForm instanceof HTMLFormElement) {
+    settingsForm.querySelectorAll('input, textarea, button').forEach((control) => { control.disabled = true; });
+  }
+  setMessage(settingsStatus, 'Payment settings are disabled in sample preview mode.');
+  void loadOrders();
+} else if (!supabase || adminEmails.size === 0) {
   setMessage(loginStatus, 'Admin sign-in is not configured. Set the public Supabase URL, anon key, and allowed admin email build variable.', true);
 } else {
   void supabase.auth.getSession().then(({ data, error }) => {
@@ -257,6 +426,7 @@ if (!supabase || adminEmails.size === 0) {
       session = data.session;
       showDashboard(true);
       void loadOrders();
+      void loadPaymentSettings();
     } else if (data.session) {
       void supabase.auth.signOut();
       setMessage(loginStatus, 'This account is not allowed to access the admin dashboard.', true);

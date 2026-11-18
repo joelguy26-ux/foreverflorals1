@@ -17,7 +17,7 @@ const toppers = new Set([
   'Glitter ($300)',
   'Butterfly ($100 ea)',
   'Bow ($100 ea)',
-  'Banner ($100 ea)',
+  'Banner ($500 ea)',
   'Crown ($500)',
   'Tiara ($1,000)',
   "Baby's breath ($800)",
@@ -30,7 +30,7 @@ const topperPrices = new Map([
   ['Glitter ($300)', 300],
   ['Butterfly ($100 ea)', 100],
   ['Bow ($100 ea)', 100],
-  ['Banner ($100 ea)', 100],
+  ['Banner ($500 ea)', 500],
   ['Crown ($500)', 500],
   ['Tiara ($1,000)', 1000],
   ["Baby's breath ($800)", 800],
@@ -204,6 +204,39 @@ function orderEmail(payload, orderId, imageUrl) {
   return lines.join('\n');
 }
 
+function customerOrderEmail(payload, orderId) {
+  const bouquets = payload.cart.map(({ id, quantity }) => ({
+    name: products[id].name,
+    quantity,
+    unitPrice: products[id].price,
+  }));
+  const subtotal = payload.cart.reduce((sum, item) => sum + (products[item.id].price || 0) * item.quantity, 0);
+  const topperSubtotal = payload.toppers.reduce((sum, item) => sum + (topperPrices.get(item) || 0), 0);
+  const topperCounts = new Map();
+  payload.toppers.forEach((item) => topperCounts.set(item, (topperCounts.get(item) || 0) + 1));
+  const topperLines = [...topperCounts].map(([item, quantity]) => `- ${quantity} x ${item}`);
+  return [
+    `Hello ${payload.customer.name},`,
+    '',
+    'We received your Forever Florals order enquiry. The shop will review it and follow up with you to confirm the final price and details.',
+    '',
+    `Order reference: ${orderId}`,
+    `Date needed: ${payload.dateNeeded}`,
+    `Occasion: ${payload.occasion || 'Not specified'}`,
+    `Delivery: ${payload.delivery}`,
+    '',
+    'Bouquets:',
+    ...bouquets.map((item) => `- ${item.quantity} x ${item.name}${item.unitPrice === null ? ' (price to be confirmed)' : ` (JMD ${item.unitPrice.toLocaleString()} each)`}`),
+    'Toppers and extras:',
+    ...(topperLines.length ? topperLines : ['- None']),
+    `Current estimate: JMD ${(subtotal + topperSubtotal).toLocaleString()}`,
+    '',
+    'This is an acknowledgement, not an invoice. Delivery charges and quoted items may change the final total. We will email your invoice after confirming your order.',
+    '',
+    'Thank you for choosing Forever Florals.',
+  ].join('\n');
+}
+
 export default async function handler(req, res) {
   if (req.method === 'GET') {
     return json(res, 200, { ready: isReady() });
@@ -279,6 +312,7 @@ export default async function handler(req, res) {
       special_instructions: payload.specialInstructions.trim() || null,
       inspiration_path: inspirationPath,
       notification_status: 'pending',
+      customer_notification_status: 'pending',
     };
     const { error: insertError } = await supabase.from('orders').insert(row);
     if (insertError) {
@@ -287,35 +321,49 @@ export default async function handler(req, res) {
       return json(res, 500, { error: 'We could not save your order. Please try again or contact us on WhatsApp.' });
     }
 
-    let emailSent = false;
-    let notificationError;
-    try {
-      const resend = new Resend(process.env.RESEND_API_KEY);
-      const { error } = await resend.emails.send({
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    async function sendOrderEmail(kind, options) {
+      try {
+        const { error } = await resend.emails.send(options);
+        if (error) throw new Error(error.message);
+        return true;
+      } catch (error) {
+        console.error(`Order was saved, but its ${kind} email failed.`, error instanceof Error ? error.message : 'Unknown email delivery error.');
+        return false;
+      }
+    }
+
+    const [shopEmailSent, customerEmailSent] = await Promise.all([
+      sendOrderEmail('shop notification', {
         from: process.env.ORDER_FROM_EMAIL,
         to: [process.env.ORDER_NOTIFICATION_EMAIL],
         replyTo: payload.customer.email.trim(),
         subject: `Action needed: Review new Forever Florals order (${orderId.slice(0, 8)})`,
         text: orderEmail(payload, orderId, inspirationUrl),
-      });
-      if (error) throw new Error(error.message);
-      emailSent = true;
-    } catch (error) {
-      notificationError = error instanceof Error ? error.message : 'Unknown email delivery error.';
-      console.error('Order was saved, but its email notification failed.', notificationError);
-    }
+      }),
+      sendOrderEmail('customer confirmation', {
+        from: process.env.ORDER_FROM_EMAIL,
+        to: [payload.customer.email.trim()],
+        replyTo: process.env.ORDER_NOTIFICATION_EMAIL,
+        subject: `We received your Forever Florals order (${orderId.slice(0, 8)})`,
+        text: customerOrderEmail(payload, orderId),
+      }),
+    ]);
 
     const { error: updateError } = await supabase
       .from('orders')
-      .update({ notification_status: emailSent ? 'sent' : 'failed' })
+      .update({
+        notification_status: shopEmailSent ? 'sent' : 'failed',
+        customer_notification_status: customerEmailSent ? 'sent' : 'failed',
+      })
       .eq('id', orderId);
     if (updateError) console.error('Unable to update the order notification status.', updateError.message);
 
     return json(res, 201, {
       ok: true,
       orderId,
-      emailSent,
-      ...(notificationError ? { error: 'Order saved, but the shop notification could not be sent.' } : {}),
+      shopEmailSent,
+      customerEmailSent,
     });
   } catch (error) {
     console.error('Order processing failed.', error instanceof Error ? error.message : 'Unknown order processing error.');

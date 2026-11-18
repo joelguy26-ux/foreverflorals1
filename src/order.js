@@ -566,19 +566,17 @@ form?.addEventListener('submit', async (event) => {
     if (!response.ok) {
       throw new Error(result.error || 'We could not submit your order. Please try again.');
     }
-    if (result.emailSent) {
-      setStatus('Your order was received. Forever Florals will follow up with you soon.');
-      if (orderConfirmationMessage) {
-        orderConfirmationMessage.textContent = 'Your order was received. Forever Florals will follow up with you soon.';
-      }
-      if (confirmationWhatsapp) confirmationWhatsapp.hidden = true;
-    } else {
-      setStatus('Your order was saved, but the shop notification could not be sent. Please also contact us on WhatsApp.', true);
-      if (orderConfirmationMessage) {
-        orderConfirmationMessage.textContent = 'Your order was saved, but the shop notification could not be sent. Please message us on WhatsApp so we can follow up.';
-      }
-      if (confirmationWhatsapp) confirmationWhatsapp.hidden = false;
-    }
+    const message = result.shopEmailSent
+      ? result.customerEmailSent
+        ? 'Your order was received. A confirmation email was sent, and Forever Florals will follow up with you soon.'
+        : 'Your order was received and Forever Florals was notified, but your confirmation email could not be sent. Please check your email address or contact us on WhatsApp.'
+      : result.customerEmailSent
+        ? 'Your order was received and a confirmation email was sent, but Forever Florals could not be notified. Please also contact us on WhatsApp.'
+        : 'Your order was saved, but neither email notification could be sent. Please contact Forever Florals on WhatsApp.';
+    const notificationFailed = !result.shopEmailSent || !result.customerEmailSent;
+    setStatus(message, notificationFailed);
+    if (orderConfirmationMessage) orderConfirmationMessage.textContent = message;
+    if (confirmationWhatsapp) confirmationWhatsapp.hidden = !notificationFailed;
     orderConfirmation?.showModal();
     closeConfirmationButton?.focus();
     cart = [];

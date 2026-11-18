@@ -1,12 +1,6 @@
 import { Resend } from 'resend';
 import { authorizeAdmin, json } from '../../../lib/admin.js';
 
-const paymentEnvironment = [
-  'PAYMENT_BANK_NAME',
-  'PAYMENT_ACCOUNT_NAME',
-  'PAYMENT_ACCOUNT_NUMBER',
-];
-
 function formatJmd(amount) {
   return `JMD ${amount.toLocaleString('en-JM')}`;
 }
@@ -27,12 +21,12 @@ function groupToppers(toppers) {
   return [...counts].map(([item, quantity]) => ({ item, quantity }));
 }
 
-function invoiceEmail(order) {
-  const bankName = process.env.PAYMENT_BANK_NAME.trim();
-  const accountName = process.env.PAYMENT_ACCOUNT_NAME.trim();
-  const accountNumber = process.env.PAYMENT_ACCOUNT_NUMBER.trim();
-  const branch = process.env.PAYMENT_BANK_BRANCH?.trim();
-  const instructions = process.env.PAYMENT_INSTRUCTIONS?.trim();
+function invoiceEmail(order, settings) {
+  const bankName = settings.payment_bank_name;
+  const accountName = settings.payment_account_name;
+  const accountNumber = settings.payment_account_number;
+  const branch = settings.payment_bank_branch;
+  const instructions = settings.payment_instructions;
   const reference = order.id.slice(0, 8).toUpperCase();
   const bouquets = Array.isArray(order.bouquet_items) ? order.bouquet_items : [];
   const bouquetLines = bouquets.map((item) => {
@@ -61,6 +55,7 @@ function invoiceEmail(order) {
     ...(branch ? [`Branch: ${branch}`] : []),
     `Payment reference: ${reference}`,
     ...(instructions ? ['', instructions] : []),
+    ...(order.customer_note?.trim() ? ['', 'Message from Forever Florals:', order.customer_note.trim()] : []),
     '',
     'Please reply to this email with your payment confirmation. Thank you for choosing Forever Florals.',
   ];
@@ -80,21 +75,28 @@ function invoiceEmail(order) {
         <strong>Account number:</strong> ${escapeHtml(accountNumber)}${branch ? `<br><strong>Branch:</strong> ${escapeHtml(branch)}` : ''}<br>
         <strong>Payment reference:</strong> ${reference}</p>
       ${instructions ? `<p>${escapeHtml(instructions).replace(/\n/g, '<br>')}</p>` : ''}
+      ${order.customer_note?.trim() ? `<h2>Message from Forever Florals</h2><p>${escapeHtml(order.customer_note.trim()).replace(/\n/g, '<br>')}</p>` : ''}
       <p>Please reply to this email with your payment confirmation. Thank you for choosing Forever Florals.</p>
     </div>`;
   return { text: textLines.join('\n'), html };
 }
 
-async function sendInvoice(order) {
-  const missingPaymentFields = paymentEnvironment.filter((name) => !process.env[name]?.trim());
-  if (missingPaymentFields.length) {
-    return { error: `Configure payment details before sending invoices: ${missingPaymentFields.join(', ')}.` };
-  }
+async function sendInvoice(order, supabase) {
   if (!process.env.RESEND_API_KEY?.trim() || !process.env.ORDER_FROM_EMAIL?.trim()) {
     return { error: 'Email delivery is not configured. Set RESEND_API_KEY and ORDER_FROM_EMAIL.' };
   }
 
   try {
+    const { data: settings, error: settingsError } = await supabase
+      .from('admin_settings')
+      .select('payment_bank_name, payment_account_name, payment_account_number, payment_bank_branch, payment_instructions')
+      .eq('singleton', true)
+      .maybeSingle();
+    if (settingsError) throw settingsError;
+    if (!settings?.payment_bank_name || !settings.payment_account_name || !settings.payment_account_number) {
+      return { error: 'Save the bank name, account name, and account number in dashboard payment settings before sending an invoice.' };
+    }
+
     const resend = new Resend(process.env.RESEND_API_KEY);
     const reference = order.id.slice(0, 8).toUpperCase();
     const { error } = await resend.emails.send({
@@ -102,7 +104,7 @@ async function sendInvoice(order) {
       to: [order.customer_email],
       replyTo: process.env.ORDER_NOTIFICATION_EMAIL,
       subject: `Forever Florals invoice ${reference}`,
-      ...invoiceEmail(order),
+      ...invoiceEmail(order, settings),
     });
     return error ? { error: error.message } : {};
   } catch (error) {
@@ -134,6 +136,25 @@ export default async function handler(req, res) {
     if (!order) return json(res, 404, { error: 'Order not found.' });
 
     const action = req.body?.action;
+    if (action === 'save_customer_note') {
+      if (typeof req.body?.note !== 'string' || req.body.note.length > 2000) {
+        return json(res, 400, { error: 'Customer notes must be 2,000 characters or fewer.' });
+      }
+      if (order.invoice_sent_at) {
+        return json(res, 409, { error: 'This customer note is locked because the invoice has already been sent.' });
+      }
+      const { data, error } = await authorization.supabase
+        .from('orders')
+        .update({ customer_note: req.body.note.trim() })
+        .eq('id', orderId)
+        .is('invoice_sent_at', null)
+        .select('id')
+        .maybeSingle();
+      if (error) throw error;
+      if (!data) return json(res, 409, { error: 'This customer note could not be saved. Refresh the dashboard and try again.' });
+      return json(res, 200, { ok: true });
+    }
+
     if (action === 'confirm' || action === 'resend_invoice') {
       const total = action === 'confirm' ? req.body?.confirmedTotalJmd : order.confirmed_total_jmd;
       if (!Number.isSafeInteger(total) || total <= 0) {
@@ -165,7 +186,7 @@ export default async function handler(req, res) {
         confirmedOrder = data;
       }
 
-      const invoiceResult = await sendInvoice(confirmedOrder);
+      const invoiceResult = await sendInvoice(confirmedOrder, authorization.supabase);
       if (invoiceResult.error) {
         console.error('Order confirmed but invoice delivery failed.', invoiceResult.error);
         return json(res, 502, {

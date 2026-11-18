@@ -11,6 +11,13 @@ portable when the site is deployed and do not contain local computer paths.
 3. Run `npm run dev` and open the local URL printed by Vite.
 4. Run `npm run build` to produce the deployable `dist` folder.
 
+### Preview the admin dashboard locally
+
+Start the Vite development server and open `/admin.html`. In local development,
+the dashboard opens directly with fictional sample orders; order actions and
+emails are disabled. This preview is enabled only in Vite development mode and
+is not available in production builds or deployments.
+
 ## Order flow
 
 Bouquet cards and the "Order Now" button open a separate order page. Customers
@@ -24,27 +31,38 @@ process payments.
 
 Order submissions are processed by the Vercel serverless endpoint in `api/orders.js`.
 The endpoint validates the submitted order, stores it in Supabase, uploads any
-inspiration photo to a private Storage bucket, and emails the shop through Resend.
+inspiration photo to a private Storage bucket, emails the shop through Resend,
+and sends the customer an order-received acknowledgement. The shop notification
+and customer acknowledgement are attempted independently; an email failure
+does not discard the saved order.
 The private `/admin.html` dashboard lets the allowlisted admin review inquiries,
 set a confirmed total, and email the customer a bank-transfer invoice. Once the
 invoice is sent, the admin can mark the order paid. Lifetime purchase count and
-JMD revenue include paid orders only. No online payment is processed.
+JMD revenue include paid orders only. Admins can update invoice bank details and
+customer-facing payment instructions in the dashboard, and save a customer
+message on each order to include in its invoice. The message becomes read-only
+after the first invoice is sent. No online payment is processed.
 
-The dashboard uses Supabase Auth for sign-in. Disable public sign-ups in Supabase
-and create both admin accounts yourself. Server APIs independently verify the
-signed-in account against the comma-separated `ORDER_ADMIN_EMAILS` allowlist;
+The dashboard uses Supabase Auth for passwordless sign-in. Create both admin
+accounts yourself and disable public sign-ups in Supabase. No admin password is
+stored in this repository. Admins enter an allowlisted email and open the
+secure sign-in link delivered to that inbox. Server APIs independently verify
+the signed-in account against the comma-separated `ORDER_ADMIN_EMAILS` allowlist;
 the browser-side allowlist is only a convenience and is not an authorization
 control.
 
 Supabase service-role and Resend API keys are server-only environment variables
-and must never use a `VITE_` prefix. Bank details are also server-only and are
-included only in invoice emails.
+and must never use a `VITE_` prefix. Bank details are stored in the admin-only
+Supabase settings table and are included only in invoice emails.
 
 ### Connect Supabase and Resend
 
 1. In the Supabase project, open **SQL Editor**, run the migrations in order:
    `supabase/migrations/20261023000000_create_orders.sql`, then
-   `supabase/migrations/20261023010000_add_order_confirmation_and_payment.sql`.
+   `supabase/migrations/20261023010000_add_order_confirmation_and_payment.sql`,
+   then `supabase/migrations/20261115000000_track_customer_order_email.sql`,
+   then `supabase/migrations/20261117000000_admin_payment_settings_and_notes.sql`,
+   then `supabase/migrations/20261118000000_order_customer_note.sql`.
    Confirm the `orders` table and private `order-inspiration` Storage bucket were created.
 2. In Supabase **Project Settings → API**, copy the project URL and the
    `service_role` secret key. Keep the service-role key private.
@@ -53,21 +71,22 @@ included only in invoice emails.
 4. In Resend, create an API key. For production delivery, verify a domain you
    own and use an address on that domain as `ORDER_FROM_EMAIL`. Until a domain
    is verified, Resend's test sender can only send to the email address allowed
-   by your Resend account.
+   by your Resend account; this can prevent both customer receipts and shop
+   notifications from reaching their recipients.
 5. In Supabase **Authentication → Users**, create admin users for
    `joelguy26@gmail.com` and `Foreverflorals.ltd@gmail.com`. Disable public
    sign-ups so other visitors cannot create accounts. Use Supabase
-   email/password sign-in for the dashboard.
+   email provider enabled. Add the deployed `/admin.html` URL to Supabase
+   **Authentication → URL Configuration → Redirect URLs** so sign-in links
+   return to the dashboard. Configure Supabase Auth email delivery (SMTP) so
+   sign-in links reliably reach the admin inboxes.
 6. In Vercel, open the project **Settings → Environment Variables** and add
    `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `ORDER_RATE_LIMIT_SECRET`,
    `RESEND_API_KEY`, `ORDER_NOTIFICATION_EMAIL` (`Foreverflorals.ltd@gmail.com`),
    `ORDER_FROM_EMAIL`, and
    `ORDER_ADMIN_EMAILS` (`joelguy26@gmail.com,Foreverflorals.ltd@gmail.com`)
-   for Production (and Preview if desired). Add the bank
-   transfer details as `PAYMENT_BANK_NAME`, `PAYMENT_ACCOUNT_NAME`, and
-   `PAYMENT_ACCOUNT_NUMBER`; optionally set `PAYMENT_BANK_BRANCH` and
-   `PAYMENT_INSTRUCTIONS`. These values are used only by the server when it
-   emails an invoice.
+   for Production (and Preview if desired). Bank transfer details and
+   customer-facing payment notes are entered by an admin in the dashboard.
 7. Add `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, and
    `VITE_ORDER_ADMIN_EMAILS` (`joelguy26@gmail.com,Foreverflorals.ltd@gmail.com`)
    as a Vercel environment variable for the dashboard build. The anon key is
@@ -81,7 +100,11 @@ included only in invoice emails.
    mark it paid to check the dashboard's lifetime count and revenue.
 
 If an email notification fails after saving, the order remains in Supabase and
-the customer is asked to contact the shop on WhatsApp as a backup.
+the customer is asked to contact the shop on WhatsApp as a backup. If expected
+emails are not arriving, check the Vercel Production values for
+`RESEND_API_KEY`, `ORDER_FROM_EMAIL`, and `ORDER_NOTIFICATION_EMAIL`, verify the
+sender domain in Resend, redeploy after changing environment variables, and
+review the Resend email logs and spam folders.
 
 ## Deploy with Vercel
 
