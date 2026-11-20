@@ -82,10 +82,22 @@
         <h2 id="login-heading">Admin sign in</h2>
         <form data-login-form>
           <label>Email address<input type="email" name="email" autocomplete="email" required></label>
-          <button type="submit">Email me a sign-in link</button>
+          <label>Password<input type="password" name="password" autocomplete="current-password" required></label>
+          <button type="submit">Sign in</button>
+          <button class="secondary" type="button" data-password-reset>Set or reset password by email</button>
         </form>
-        <p class="status" data-login-status role="status">Enter an allowed admin email. We’ll email you a secure sign-in link.</p>
+        <p class="status" data-login-status role="status">Sign in with your admin email and password, or request a secure link to set/reset your password.</p>
         <a class="preview-link" data-preview-link href="/admin.html" hidden>Preview dashboard with sample data (local only)</a>
+      </section>
+
+      <section class="panel login" data-password-recovery hidden aria-labelledby="password-recovery-heading">
+        <h2 id="password-recovery-heading">Set a new admin password</h2>
+        <form data-password-form>
+          <label>New password<input type="password" name="password" autocomplete="new-password" minlength="8" required></label>
+          <label>Confirm new password<input type="password" name="confirm-password" autocomplete="new-password" minlength="8" required></label>
+          <button type="submit">Save new password</button>
+        </form>
+        <p class="status" data-password-status role="status"></p>
       </section>
 
       <section data-dashboard hidden>

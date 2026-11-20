@@ -43,10 +43,10 @@ customer-facing payment instructions in the dashboard, and save a customer
 message on each order to include in its invoice. The message becomes read-only
 after the first invoice is sent. No online payment is processed.
 
-The dashboard uses Supabase Auth for passwordless sign-in. Create both admin
-accounts yourself and disable public sign-ups in Supabase. No admin password is
-stored in this repository. Admins enter an allowlisted email and open the
-secure sign-in link delivered to that inbox. Server APIs independently verify
+The dashboard uses Supabase Auth email/password sign-in. Create both admin
+accounts yourself and disable public sign-ups in Supabase. Admins can request a
+secure password setup/reset link from the dashboard, save a password on the
+verified recovery page, then sign in with that password. Server APIs independently verify
 the signed-in account against the comma-separated `ORDER_ADMIN_EMAILS` allowlist;
 the browser-side allowlist is only a convenience and is not an authorization
 control.
@@ -76,10 +76,10 @@ Supabase settings table and are included only in invoice emails.
 5. In Supabase **Authentication → Users**, create admin users for
    `joelguy26@gmail.com` and `Foreverflorals.ltd@gmail.com`. Disable public
    sign-ups so other visitors cannot create accounts. Use Supabase
-   email provider enabled. Add the deployed `/admin.html` URL to Supabase
+   email/password provider enabled. Add the deployed `/admin.html` URL to Supabase
    **Authentication → URL Configuration → Redirect URLs** so sign-in links
    return to the dashboard. Configure Supabase Auth email delivery (SMTP) so
-   sign-in links reliably reach the admin inboxes.
+   password setup/reset links reliably reach the admin inboxes.
 6. In Vercel, open the project **Settings → Environment Variables** and add
    `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `ORDER_RATE_LIMIT_SECRET`,
    `RESEND_API_KEY`, `ORDER_NOTIFICATION_EMAIL` (`Foreverflorals.ltd@gmail.com`),

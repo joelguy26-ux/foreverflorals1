@@ -3,6 +3,10 @@ import { createClient } from '@supabase/supabase-js';
 const loginPanel = document.querySelector('[data-login-panel]');
 const loginForm = document.querySelector('[data-login-form]');
 const loginStatus = document.querySelector('[data-login-status]');
+const passwordResetButton = document.querySelector('[data-password-reset]');
+const passwordRecoveryPanel = document.querySelector('[data-password-recovery]');
+const passwordForm = document.querySelector('[data-password-form]');
+const passwordStatus = document.querySelector('[data-password-status]');
 const previewLink = document.querySelector('[data-preview-link]');
 const previewNotice = document.querySelector('[data-preview-notice]');
 const settingsForm = document.querySelector('[data-settings-form]');
@@ -23,6 +27,8 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL?.trim();
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY?.trim();
 const supabase = supabaseUrl && supabaseAnonKey ? createClient(supabaseUrl, supabaseAnonKey) : null;
 const previewMode = import.meta.env.DEV;
+const recoveryLink = new URLSearchParams(window.location.hash.slice(1)).get('type') === 'recovery'
+  || new URLSearchParams(window.location.search).get('type') === 'recovery';
 let session = null;
 
 function setMessage(element, message, isError = false) {
@@ -44,8 +50,26 @@ function createTextElement(tag, className, content) {
 
 function showDashboard(isSignedIn) {
   if (loginPanel) loginPanel.hidden = isSignedIn;
+  if (passwordRecoveryPanel) passwordRecoveryPanel.hidden = true;
   if (dashboard) dashboard.hidden = !isSignedIn;
   if (signOutButton) signOutButton.hidden = !isSignedIn;
+}
+
+function showPasswordRecovery(recoverySession) {
+  const email = recoverySession?.user.email?.trim().toLowerCase();
+  if (!recoverySession || !adminEmails.has(email || '')) {
+    setMessage(loginStatus, 'This password reset link is invalid or expired. Request a new one using an allowed admin email.', true);
+    if (loginPanel) loginPanel.hidden = false;
+    if (passwordRecoveryPanel) passwordRecoveryPanel.hidden = true;
+    return false;
+  }
+  session = recoverySession;
+  if (loginPanel) loginPanel.hidden = true;
+  if (dashboard) dashboard.hidden = true;
+  if (passwordRecoveryPanel) passwordRecoveryPanel.hidden = false;
+  if (signOutButton) signOutButton.hidden = true;
+  setMessage(passwordStatus, 'Choose a new password for your admin account.');
+  return true;
 }
 
 function bouquetDescription(order) {
@@ -362,27 +386,99 @@ async function signIn(event) {
   }
   const values = new FormData(loginForm);
   const email = String(values.get('email') || '').trim().toLowerCase();
+  const password = String(values.get('password') || '');
   if (!adminEmails.has(email)) {
     setMessage(loginStatus, 'This email is not allowed to access the admin dashboard.', true);
     return;
   }
-  setMessage(loginStatus, 'Sending your secure sign-in link…');
+  setMessage(loginStatus, 'Signing in…');
   try {
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: `${window.location.origin}/admin.html`,
-        shouldCreateUser: false,
-      },
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    if (!data.session || !adminEmails.has(data.user.email?.trim().toLowerCase() || '')) {
+      await supabase.auth.signOut();
+      throw new Error('This account is not allowed to access the admin dashboard.');
+    }
+    session = data.session;
+    showDashboard(true);
+    await loadOrders();
+    await loadPaymentSettings();
+  } catch (error) {
+    setMessage(loginStatus, error instanceof Error ? error.message : 'Sign in could not be completed.', true);
+  }
+}
+
+async function requestPasswordReset() {
+  if (previewMode) return;
+  if (!supabase || adminEmails.size === 0 || !(loginForm instanceof HTMLFormElement)) {
+    setMessage(loginStatus, 'Admin sign-in is not configured. Set the public Supabase URL, anon key, and allowed admin email build variable.', true);
+    return;
+  }
+  const emailInput = loginForm.elements.namedItem('email');
+  const email = emailInput instanceof HTMLInputElement ? emailInput.value.trim().toLowerCase() : '';
+  if (!adminEmails.has(email)) {
+    setMessage(loginStatus, 'Enter an allowed admin email address first.', true);
+    return;
+  }
+
+  setMessage(loginStatus, 'Sending a password setup/reset link…');
+  try {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/admin.html`,
     });
     if (error) throw error;
-    setMessage(loginStatus, 'If this admin account exists, a secure sign-in link has been sent. Check your inbox and spam folder, then open the link on this device.');
+    setMessage(loginStatus, 'If this admin account exists, a secure password setup/reset link has been sent. Check your inbox and spam folder.');
   } catch (error) {
-    setMessage(loginStatus, error instanceof Error ? error.message : 'The sign-in email could not be sent.', true);
+    setMessage(loginStatus, error instanceof Error ? error.message : 'The password setup/reset email could not be sent.', true);
+  }
+}
+
+async function saveNewPassword(event) {
+  event.preventDefault();
+  if (!supabase || !(passwordForm instanceof HTMLFormElement) || !session) {
+    setMessage(passwordStatus, 'This password reset link is invalid or expired. Request a new one.', true);
+    return;
+  }
+  const values = new FormData(passwordForm);
+  const password = String(values.get('password') || '');
+  const confirmation = String(values.get('confirm-password') || '');
+  if (password.length < 8) {
+    setMessage(passwordStatus, 'Choose a password with at least 8 characters.', true);
+    return;
+  }
+  if (password !== confirmation) {
+    setMessage(passwordStatus, 'The passwords do not match.', true);
+    return;
+  }
+
+  const submitButton = passwordForm.querySelector('button[type="submit"]');
+  if (submitButton instanceof HTMLButtonElement) submitButton.disabled = true;
+  setMessage(passwordStatus, 'Saving your new password…');
+  try {
+    const { error } = await supabase.auth.updateUser({ password });
+    if (error) throw error;
+    const email = session.user.email?.trim().toLowerCase() || '';
+    const { error: signOutError } = await supabase.auth.signOut();
+    if (signOutError) throw signOutError;
+    session = null;
+    passwordForm.reset();
+    if (passwordRecoveryPanel) passwordRecoveryPanel.hidden = true;
+    if (loginPanel) loginPanel.hidden = false;
+    if (loginForm instanceof HTMLFormElement) {
+      const emailInput = loginForm.elements.namedItem('email');
+      if (emailInput instanceof HTMLInputElement) emailInput.value = email;
+    }
+    setMessage(loginStatus, 'Password saved. Sign in with your new password.');
+  } catch (error) {
+    setMessage(passwordStatus, error instanceof Error ? error.message : 'The new password could not be saved.', true);
+  } finally {
+    if (submitButton instanceof HTMLButtonElement) submitButton.disabled = false;
   }
 }
 
 if (loginForm instanceof HTMLFormElement) loginForm.addEventListener('submit', (event) => void signIn(event));
+if (passwordResetButton) passwordResetButton.addEventListener('click', () => void requestPasswordReset());
+if (passwordForm instanceof HTMLFormElement) passwordForm.addEventListener('submit', (event) => void saveNewPassword(event));
 if (settingsForm instanceof HTMLFormElement) settingsForm.addEventListener('submit', (event) => void savePaymentSettings(event));
 if (signOutButton) {
   signOutButton.addEventListener('click', async () => {
@@ -416,9 +512,16 @@ if (previewMode) {
 } else if (!supabase || adminEmails.size === 0) {
   setMessage(loginStatus, 'Admin sign-in is not configured. Set the public Supabase URL, anon key, and allowed admin email build variable.', true);
 } else {
+  supabase.auth.onAuthStateChange((event, authSession) => {
+    if (event === 'PASSWORD_RECOVERY') showPasswordRecovery(authSession);
+  });
   void supabase.auth.getSession().then(({ data, error }) => {
     if (error) {
       setMessage(loginStatus, error.message, true);
+      return;
+    }
+    if (recoveryLink) {
+      showPasswordRecovery(data.session);
       return;
     }
     const userEmail = data.session?.user.email?.trim().toLowerCase();
