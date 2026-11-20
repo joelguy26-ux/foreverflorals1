@@ -27,6 +27,7 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL?.trim();
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY?.trim();
 const supabase = supabaseUrl && supabaseAnonKey ? createClient(supabaseUrl, supabaseAnonKey) : null;
 const previewMode = import.meta.env.DEV;
+const adminRedirectUrl = 'https://www.foreverflorals.store/admin.html';
 const recoveryLink = new URLSearchParams(window.location.hash.slice(1)).get('type') === 'recovery'
   || new URLSearchParams(window.location.search).get('type') === 'recovery';
 let session = null;
@@ -424,7 +425,7 @@ async function requestPasswordReset() {
   setMessage(loginStatus, 'Sending a password setup/reset link…');
   try {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/admin.html`,
+      redirectTo: adminRedirectUrl,
     });
     if (error) throw error;
     setMessage(loginStatus, 'If this admin account exists, a secure password setup/reset link has been sent. Check your inbox and spam folder.');
