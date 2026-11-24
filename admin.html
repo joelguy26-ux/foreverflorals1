@@ -17,6 +17,12 @@
     .wrap{width:min(1120px,calc(100% - 36px));margin:0 auto}
     header{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:22px 0}
     header a{color:var(--deep);font-weight:700}
+    .site-banner{display:block;width:100%;padding:8px 0 10px;background:rgba(244,160,193,.94);border-bottom:2px solid #000;text-align:center;color:var(--deep);font-size:.86rem}
+    .site-banner b{color:var(--magenta)}
+    .site-banner:hover{background:#f4a0c1}
+    .admin-header{width:min(1120px,calc(100% - 36px));margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:12px 0}
+    .admin-header .logo{height:42px;width:250px;overflow:hidden;display:block}
+    .admin-header .logo img{height:84px;width:auto;max-width:none;transform:translateY(-21px) scale(1.25);transform-origin:left center}
     h1,h2,h3{font-family:'Fraunces',serif;line-height:1.15;color:var(--deep)}
     h1{margin:0;font-size:clamp(2.2rem,5vw,3.4rem)}
     h2{margin:0 0 16px}
@@ -80,13 +86,14 @@
     @keyframes dashboardEnter{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
     @media(prefers-reduced-motion:reduce){.login-exit,.login-enter,.dashboard-enter{animation:none}}
     @media(max-width:760px){.order-list{grid-template-columns:1fr}}
-    @media(max-width:600px){.wrap{width:min(100% - 24px,1120px)}.panel{padding:18px;box-shadow:7px 7px 0 #000}.metrics,.order-columns,.settings-form{grid-template-columns:1fr}.settings-form .full{grid-column:auto}.order-top{flex-direction:column}.orders-header{align-items:flex-start}}
+    @media(max-width:600px){.wrap{width:min(100% - 24px,1120px)}.admin-header{width:min(100% - 24px,1120px)}.admin-header .logo{width:130px;height:30px}.admin-header .logo img{height:54px;transform:translateY(-12px) scale(1.25)}.panel{padding:18px;box-shadow:7px 7px 0 #000}.metrics,.order-columns,.settings-form{grid-template-columns:1fr}.settings-form .full{grid-column:auto}.order-top{flex-direction:column}.orders-header{align-items:flex-start}}
   </style>
 </head>
 <body>
+  <a class="site-banner" href="/" aria-label="Go to the Forever Florals home page">🎀 <b>New:</b> Money Bouquets now available, every order handfolded to your specs</a>
   <div class="wrap">
-    <header>
-      <a href="/" aria-label="Forever Florals home">Forever Florals</a>
+    <header class="admin-header">
+      <a class="logo" href="/" aria-label="Forever Florals home"><img src="/images/forever-florals-logo.png" alt="Forever Florals"></a>
       <button class="secondary" type="button" data-sign-out hidden>Sign out</button>
     </header>
     <main>
