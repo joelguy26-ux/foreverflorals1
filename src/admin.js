@@ -50,9 +50,29 @@ function createTextElement(tag, className, content) {
 }
 
 function showDashboard(isSignedIn) {
-  if (loginPanel) loginPanel.hidden = isSignedIn;
+  if (loginPanel) {
+    loginPanel.classList.remove('login-enter');
+    if (isSignedIn) {
+      loginPanel.classList.add('login-exit');
+      window.setTimeout(() => {
+        loginPanel.hidden = true;
+        loginPanel.classList.remove('login-exit');
+      }, 280);
+    } else {
+      loginPanel.hidden = false;
+      loginPanel.classList.add('login-enter');
+      window.setTimeout(() => loginPanel.classList.remove('login-enter'), 320);
+    }
+  }
   if (passwordRecoveryPanel) passwordRecoveryPanel.hidden = true;
-  if (dashboard) dashboard.hidden = !isSignedIn;
+  if (dashboard) {
+    dashboard.hidden = !isSignedIn;
+    dashboard.classList.remove('dashboard-enter');
+    if (isSignedIn) {
+      void dashboard.offsetWidth;
+      dashboard.classList.add('dashboard-enter');
+    }
+  }
   if (signOutButton) signOutButton.hidden = !isSignedIn;
 }
 
@@ -480,6 +500,18 @@ async function saveNewPassword(event) {
 if (loginForm instanceof HTMLFormElement) loginForm.addEventListener('submit', (event) => void signIn(event));
 if (passwordResetButton) passwordResetButton.addEventListener('click', () => void requestPasswordReset());
 if (passwordForm instanceof HTMLFormElement) passwordForm.addEventListener('submit', (event) => void saveNewPassword(event));
+document.querySelectorAll('[data-password-toggle]').forEach((toggle) => {
+  toggle.addEventListener('click', () => {
+    const field = toggle.closest('.password-field')?.querySelector('input');
+    if (!(field instanceof HTMLInputElement)) return;
+    const reveal = field.type === 'password';
+    field.type = reveal ? 'text' : 'password';
+    toggle.setAttribute('aria-pressed', String(reveal));
+    toggle.setAttribute('aria-label', reveal
+      ? toggle.getAttribute('aria-label')?.replace(/^Show/, 'Hide') || 'Hide password'
+      : toggle.getAttribute('aria-label')?.replace(/^Hide/, 'Show') || 'Show password');
+  });
+});
 if (settingsForm instanceof HTMLFormElement) settingsForm.addEventListener('submit', (event) => void savePaymentSettings(event));
 if (signOutButton) {
   signOutButton.addEventListener('click', async () => {

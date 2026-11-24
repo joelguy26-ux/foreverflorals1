@@ -75,11 +75,15 @@ Supabase settings table and are included only in invoice emails.
    notifications from reaching their recipients.
 5. In Supabase **Authentication → Users**, create admin users for
    `joelguy26@gmail.com` and `Foreverflorals.ltd@gmail.com`. Disable public
-   sign-ups so other visitors cannot create accounts. Use Supabase
-   email/password provider enabled. Add the deployed `/admin.html` URL to Supabase
-   **Authentication → URL Configuration → Redirect URLs** so sign-in links
-   return to the dashboard. Configure Supabase Auth email delivery (SMTP) so
-   password setup/reset links reliably reach the admin inboxes.
+   sign-ups so other visitors cannot create accounts. Enable the Supabase
+   email/password provider. In **Authentication → URL Configuration**, set the
+   **Site URL** to `https://www.foreverflorals.store` and add
+   `https://www.foreverflorals.store/admin.html` to **Redirect URLs**. The
+   dashboard explicitly requests that production URL for password resets; if
+   you use a custom reset-email template, its link must use
+   `{{ .ConfirmationURL }}` rather than linking directly to `{{ .SiteURL }}`.
+   Configure Supabase Auth email delivery (SMTP) so password setup/reset links
+   reliably reach the admin inboxes.
 6. In Vercel, open the project **Settings → Environment Variables** and add
    `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `ORDER_RATE_LIMIT_SECRET`,
    `RESEND_API_KEY`, `ORDER_NOTIFICATION_EMAIL` (`Foreverflorals.ltd@gmail.com`),

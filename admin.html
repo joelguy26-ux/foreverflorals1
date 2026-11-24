@@ -27,6 +27,14 @@
     .login form{display:grid;gap:14px}
     label{display:grid;gap:6px;font-size:.88rem;font-weight:700}
     input,textarea{width:100%;min-height:46px;padding:10px 12px;border:2px solid #000;border-radius:0;background:#fff}
+    .password-field{position:relative}
+    .password-field input{padding-right:52px}
+    .password-toggle{position:absolute;right:8px;top:50%;width:38px;min-height:38px;padding:7px;border:0;box-shadow:none;background:#fff;transform:translateY(-50%)}
+    .password-toggle:hover:not(:disabled){transform:translateY(-50%)}
+    .password-toggle svg{display:block;width:20px;height:20px;margin:auto;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+    .password-toggle .eye-off{display:none}
+    .password-toggle[aria-pressed="true"] .eye-open{display:none}
+    .password-toggle[aria-pressed="true"] .eye-off{display:block}
     textarea{min-height:100px;resize:vertical}
     input:focus-visible,textarea:focus-visible,button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
     button{min-height:42px;padding:9px 15px;border:2px solid #000;border-radius:0;background:var(--green);box-shadow:4px 4px 0 #000;color:#000;font-weight:800;cursor:pointer;transition:transform .2s ease,box-shadow .2s ease}
@@ -64,6 +72,13 @@
     .order-notes textarea{min-height:76px}
     .preview-link{display:inline-block;margin-top:12px}
     .preview-notice{margin:0 0 20px;padding:12px 16px;border:3px solid #000;background:#fde68a;box-shadow:5px 5px 0 #000;color:#24101a;font-weight:800}
+    .login-exit{animation:loginExit .28s ease forwards}
+    .login-enter{animation:loginEnter .32s ease both}
+    .dashboard-enter{animation:dashboardEnter .42s cubic-bezier(.22,.61,.36,1) both}
+    @keyframes loginExit{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-14px)}}
+    @keyframes loginEnter{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes dashboardEnter{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+    @media(prefers-reduced-motion:reduce){.login-exit,.login-enter,.dashboard-enter{animation:none}}
     @media(max-width:760px){.order-list{grid-template-columns:1fr}}
     @media(max-width:600px){.wrap{width:min(100% - 24px,1120px)}.panel{padding:18px;box-shadow:7px 7px 0 #000}.metrics,.order-columns,.settings-form{grid-template-columns:1fr}.settings-form .full{grid-column:auto}.order-top{flex-direction:column}.orders-header{align-items:flex-start}}
   </style>
@@ -82,7 +97,17 @@
         <h2 id="login-heading">Admin sign in</h2>
         <form data-login-form>
           <label>Email address<input type="email" name="email" autocomplete="email" required></label>
-          <label>Password<input type="password" name="password" autocomplete="current-password" required></label>
+          <label>Password
+            <span class="password-field">
+              <input type="password" name="password" autocomplete="current-password" required>
+              <button class="password-toggle" type="button" data-password-toggle aria-label="Show password" aria-pressed="false">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <g class="eye-open"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></g>
+                  <g class="eye-off"><path d="M3 3l18 18M10.6 6.2A9.7 9.7 0 0 1 12 6c6 0 9.5 6 9.5 6a16 16 0 0 1-2.1 2.8M6.2 6.2C3.8 8 2.5 12 2.5 12s3.5 6 9.5 6c1 0 2-.2 2.8-.5M9.9 9.9a3 3 0 0 0 4.2 4.2"/></g>
+                </svg>
+              </button>
+            </span>
+          </label>
           <button type="submit">Sign in</button>
           <button class="secondary" type="button" data-password-reset>Set or reset password by email</button>
         </form>
@@ -93,8 +118,28 @@
       <section class="panel login" data-password-recovery hidden aria-labelledby="password-recovery-heading">
         <h2 id="password-recovery-heading">Set a new admin password</h2>
         <form data-password-form>
-          <label>New password<input type="password" name="password" autocomplete="new-password" minlength="8" required></label>
-          <label>Confirm new password<input type="password" name="confirm-password" autocomplete="new-password" minlength="8" required></label>
+          <label>New password
+            <span class="password-field">
+              <input type="password" name="password" autocomplete="new-password" minlength="8" required>
+              <button class="password-toggle" type="button" data-password-toggle aria-label="Show new password" aria-pressed="false">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <g class="eye-open"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></g>
+                  <g class="eye-off"><path d="M3 3l18 18M10.6 6.2A9.7 9.7 0 0 1 12 6c6 0 9.5 6 9.5 6a16 16 0 0 1-2.1 2.8M6.2 6.2C3.8 8 2.5 12 2.5 12s3.5 6 9.5 6c1 0 2-.2 2.8-.5M9.9 9.9a3 3 0 0 0 4.2 4.2"/></g>
+                </svg>
+              </button>
+            </span>
+          </label>
+          <label>Confirm new password
+            <span class="password-field">
+              <input type="password" name="confirm-password" autocomplete="new-password" minlength="8" required>
+              <button class="password-toggle" type="button" data-password-toggle aria-label="Show confirmation password" aria-pressed="false">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <g class="eye-open"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></g>
+                  <g class="eye-off"><path d="M3 3l18 18M10.6 6.2A9.7 9.7 0 0 1 12 6c6 0 9.5 6 9.5 6a16 16 0 0 1-2.1 2.8M6.2 6.2C3.8 8 2.5 12 2.5 12s3.5 6 9.5 6c1 0 2-.2 2.8-.5M9.9 9.9a3 3 0 0 0 4.2 4.2"/></g>
+                </svg>
+              </button>
+            </span>
+          </label>
           <button type="submit">Save new password</button>
         </form>
         <p class="status" data-password-status role="status"></p>
