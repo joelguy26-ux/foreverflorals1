@@ -41,6 +41,13 @@
     .password-toggle .eye-off{display:none}
     .password-toggle[aria-pressed="true"] .eye-open{display:none}
     .password-toggle[aria-pressed="true"] .eye-off{display:block}
+    .confirm-dialog{width:min(440px,calc(100% - 32px));margin:auto;padding:0;border:3px solid #000;background:var(--pink);color:var(--ink);box-shadow:10px 10px 0 #000}
+    .confirm-dialog::backdrop{background:rgba(44,15,30,.6);backdrop-filter:blur(3px)}
+    .confirm-dialog form{display:grid;gap:14px;padding:24px}
+    .confirm-dialog h2{margin:0}
+    .confirm-dialog p{margin:0}
+    .confirm-dialog-actions{display:flex;justify-content:flex-end;gap:12px;flex-wrap:wrap}
+    .confirm-dialog button.danger{background:#fda4af}
     textarea{min-height:100px;resize:vertical}
     input:focus-visible,textarea:focus-visible,button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
     button{min-height:42px;padding:9px 15px;border:2px solid #000;border-radius:0;background:var(--green);box-shadow:4px 4px 0 #000;color:#000;font-weight:800;cursor:pointer;transition:transform .2s ease,box-shadow .2s ease}
@@ -87,6 +94,7 @@
     @media(prefers-reduced-motion:reduce){.login-exit,.login-enter,.dashboard-enter{animation:none}}
     @media(max-width:760px){.order-list{grid-template-columns:1fr}}
     @media(max-width:600px){.wrap{width:min(100% - 24px,1120px)}.admin-header{width:min(100% - 24px,1120px)}.admin-header .logo{width:130px;height:30px}.admin-header .logo img{height:54px;transform:translateY(-12px) scale(1.25)}.panel{padding:18px;box-shadow:7px 7px 0 #000}.metrics,.order-columns,.settings-form{grid-template-columns:1fr}.settings-form .full{grid-column:auto}.order-top{flex-direction:column}.orders-header{align-items:flex-start}}
+    @media(prefers-reduced-motion:reduce){.confirm-dialog::backdrop{backdrop-filter:none}}
   </style>
 </head>
 <body>
@@ -180,6 +188,16 @@
       </section>
     </main>
   </div>
+  <dialog class="confirm-dialog" data-cancel-dialog aria-labelledby="cancel-dialog-heading" aria-describedby="cancel-dialog-message">
+    <form method="dialog">
+      <h2 data-cancel-dialog-heading id="cancel-dialog-heading">Cancel inquiry?</h2>
+      <p data-cancel-dialog-message id="cancel-dialog-message">Are you sure you want to cancel this inquiry?</p>
+      <div class="confirm-dialog-actions">
+        <button class="secondary" type="submit" value="keep">Keep inquiry</button>
+        <button class="danger" type="submit" value="confirm">Yes, cancel</button>
+      </div>
+    </form>
+  </dialog>
   <script type="module" src="/src/admin.js"></script>
 </body>
 </html>

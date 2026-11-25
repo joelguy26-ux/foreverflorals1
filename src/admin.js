@@ -7,6 +7,9 @@ const passwordResetButton = document.querySelector('[data-password-reset]');
 const passwordRecoveryPanel = document.querySelector('[data-password-recovery]');
 const passwordForm = document.querySelector('[data-password-form]');
 const passwordStatus = document.querySelector('[data-password-status]');
+const cancelDialog = document.querySelector('[data-cancel-dialog]');
+const cancelDialogHeading = document.querySelector('[data-cancel-dialog-heading]');
+const cancelDialogMessage = document.querySelector('[data-cancel-dialog-message]');
 const previewLink = document.querySelector('[data-preview-link]');
 const previewNotice = document.querySelector('[data-preview-notice]');
 const settingsForm = document.querySelector('[data-settings-form]');
@@ -36,6 +39,31 @@ function setMessage(element, message, isError = false) {
   if (!element) return;
   element.textContent = message;
   element.classList.toggle('error', isError);
+}
+
+function confirmCancellation(order) {
+  if (
+    !(cancelDialog instanceof HTMLDialogElement) ||
+    !(cancelDialogHeading instanceof HTMLElement) ||
+    !(cancelDialogMessage instanceof HTMLElement)
+  ) {
+    return Promise.reject(new Error('The cancellation confirmation dialog is unavailable.'));
+  }
+  const isInquiry = order.order_status === 'inquiry';
+  cancelDialogHeading.textContent = isInquiry ? 'Cancel this inquiry?' : 'Cancel this order?';
+  cancelDialogMessage.textContent = `Are you sure you want to cancel ${order.customer_name}'s ${isInquiry ? 'inquiry' : 'order'}? This cannot be undone from the dashboard.`;
+  cancelDialog.returnValue = '';
+
+  return new Promise((resolve, reject) => {
+    const handleClose = () => resolve(cancelDialog.returnValue === 'confirm');
+    cancelDialog.addEventListener('close', handleClose, { once: true });
+    try {
+      cancelDialog.showModal();
+    } catch (error) {
+      cancelDialog.removeEventListener('close', handleClose);
+      reject(error);
+    }
+  });
 }
 
 function formatJmd(amount) {
@@ -189,7 +217,13 @@ function createOrderCard(order) {
     cancel.type = 'button';
     cancel.className = 'danger';
     cancel.textContent = 'Cancel inquiry';
-    cancel.addEventListener('click', () => updateOrder(order.id, { action: 'cancel' }));
+    cancel.addEventListener('click', async () => {
+      try {
+        if (await confirmCancellation(order)) await updateOrder(order.id, { action: 'cancel' });
+      } catch (error) {
+        setMessage(dashboardStatus, error instanceof Error ? error.message : 'The cancellation could not be confirmed.', true);
+      }
+    });
     controls.append(label, confirm, cancel);
     card.append(controls);
   } else if (order.order_status === 'confirmed') {
@@ -214,7 +248,13 @@ function createOrderCard(order) {
     cancel.type = 'button';
     cancel.className = 'danger';
     cancel.textContent = 'Cancel order';
-    cancel.addEventListener('click', () => updateOrder(order.id, { action: 'cancel' }));
+    cancel.addEventListener('click', async () => {
+      try {
+        if (await confirmCancellation(order)) await updateOrder(order.id, { action: 'cancel' });
+      } catch (error) {
+        setMessage(dashboardStatus, error instanceof Error ? error.message : 'The cancellation could not be confirmed.', true);
+      }
+    });
     controls.append(resend, paid, cancel);
     card.append(controls);
   } else if (order.order_status === 'paid') {
