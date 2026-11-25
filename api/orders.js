@@ -177,7 +177,7 @@ function orderEmail(payload, orderId, imageUrl) {
   const lines = [
     'A new order inquiry has been received.',
     'Please review and confirm this order in the admin dashboard:',
-    'https://www.foreverflorals.store/admin.html',
+    'https://www.foreverflorals.store/admin',
     '',
     `Order reference: ${orderId}`,
     `Customer: ${payload.customer.name}`,

@@ -13,7 +13,7 @@ portable when the site is deployed and do not contain local computer paths.
 
 ### Preview the admin dashboard locally
 
-Start the Vite development server and open `/admin.html`. In local development,
+Start the Vite development server and open `/admin`. In local development,
 the dashboard opens directly with fictional sample orders; order actions and
 emails are disabled. This preview is enabled only in Vite development mode and
 is not available in production builds or deployments.
@@ -35,7 +35,7 @@ inspiration photo to a private Storage bucket, emails the shop through Resend,
 and sends the customer an order-received acknowledgement. The shop notification
 and customer acknowledgement are attempted independently; an email failure
 does not discard the saved order.
-The private `/admin.html` dashboard lets the allowlisted admin review inquiries,
+The private `/admin` dashboard lets the allowlisted admin review inquiries,
 set a confirmed total, and email the customer a bank-transfer invoice. Once the
 invoice is sent, the admin can mark the order paid. Lifetime purchase count and
 JMD revenue include paid orders only. Admins can update invoice bank details and
@@ -78,7 +78,7 @@ Supabase settings table and are included only in invoice emails.
    sign-ups so other visitors cannot create accounts. Enable the Supabase
    email/password provider. In **Authentication → URL Configuration**, set the
    **Site URL** to `https://www.foreverflorals.store` and add
-   `https://www.foreverflorals.store/admin.html` to **Redirect URLs**. The
+   `https://www.foreverflorals.store/admin` to **Redirect URLs**. The
    dashboard explicitly requests that production URL for password resets; if
    you use a custom reset-email template, its link must use
    `{{ .ConfirmationURL }}` rather than linking directly to `{{ .SiteURL }}`.
@@ -99,7 +99,7 @@ Supabase settings table and are included only in invoice emails.
 8. Redeploy the latest commit. The order page checks the server endpoint,
    retries transient check failures, and enables submission only when all
    required settings are present.
-9. Open `/admin.html`, sign in with the admin account, and verify inquiries
+9. Open `/admin`, sign in with the admin account, and verify inquiries
    appear. Confirm a test order with a final JMD total to send its invoice, then
    mark it paid to check the dashboard's lifetime count and revenue.
 

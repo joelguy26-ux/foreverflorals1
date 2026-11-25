@@ -27,7 +27,7 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL?.trim();
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY?.trim();
 const supabase = supabaseUrl && supabaseAnonKey ? createClient(supabaseUrl, supabaseAnonKey) : null;
 const previewMode = import.meta.env.DEV;
-const adminRedirectUrl = 'https://www.foreverflorals.store/admin.html';
+const adminRedirectUrl = 'https://www.foreverflorals.store/admin';
 const recoveryLink = new URLSearchParams(window.location.hash.slice(1)).get('type') === 'recovery'
   || new URLSearchParams(window.location.search).get('type') === 'recovery';
 let session = null;
